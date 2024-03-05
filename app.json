@@ -4,10 +4,10 @@
         "slug": "PlatePerfect",
         "version": "1.0.0",
         "orientation": "portrait",
-        "icon": "./assets/appIcon.png",
+        "icon": "./assets/app_icon.png",
         "userInterfaceStyle": "light",
         "splash": {
-            "image": "./assets/splashapp.png",
+            "image": "./assets/app_splash.png",
             "resizeMode": "contain",
             "backgroundColor": "#ffffff"
         },
@@ -17,7 +17,7 @@
         },
         "android": {
             "adaptiveIcon": {
-                "foregroundImage": "./assets/adaptiveAppIcon.png",
+                "foregroundImage": "./assets/adaptive_icon.png",
                 "backgroundColor": "#ffffff"
             },
             "package": "com.rasyadanfz.PlatePerfect"
