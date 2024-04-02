@@ -1,40 +1,37 @@
 {
-  "expo": {
-    "name": "PlatePerfect",
-    "slug": "PlatePerfect",
-    "version": "1.0.0",
-    "orientation": "portrait",
-    "icon": "./assets/app_icon.png",
-    "userInterfaceStyle": "light",
-    "splash": {
-      "image": "./assets/app_splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
-    },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
-    "ios": {
-      "supportsTablet": true,
-      "bundleIdentifier": "com.rasyadanfz.PlatePerfect"
-    },
-    "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive_icon.png",
-        "backgroundColor": "#ffffff"
-      },
-      "package": "com.rasyadanfz.PlatePerfect"
-    },
-    "web": {
-      "favicon": "./assets/favicon.png"
-    },
-    "extra": {
-      "eas": {
-        "projectId": "99147442-a052-473f-a45e-b78bfb8b85ff"
-      }
-    },
-    "plugins": [
-      "expo-router"
-    ]
-  }
+    "expo": {
+        "name": "PlatePerfect",
+        "slug": "PlatePerfect",
+        "version": "1.0.0",
+        "orientation": "portrait",
+        "icon": "./assets/app_icon.png",
+        "userInterfaceStyle": "light",
+        "scheme": "plate-perfect-app",
+        "splash": {
+            "image": "./assets/app_splash.png",
+            "resizeMode": "contain",
+            "backgroundColor": "#ffffff"
+        },
+        "assetBundlePatterns": ["**/*"],
+        "ios": {
+            "supportsTablet": true,
+            "bundleIdentifier": "com.rasyadanfz.PlatePerfect"
+        },
+        "android": {
+            "adaptiveIcon": {
+                "foregroundImage": "./assets/adaptive_icon.png",
+                "backgroundColor": "#ffffff"
+            },
+            "package": "com.rasyadanfz.PlatePerfect"
+        },
+        "web": {
+            "favicon": "./assets/favicon.png"
+        },
+        "extra": {
+            "eas": {
+                "projectId": "99147442-a052-473f-a45e-b78bfb8b85ff"
+            }
+        },
+        "plugins": ["expo-router"]
+    }
 }

@@ -1,17 +1,12 @@
 import { StatusBar, StyleSheet } from "react-native";
-import { NavigationContainer } from "@react-navigation/native";
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import HomeScreen from "./HomeScreen";
+import App from "./App";
+import { PaperProvider } from "react-native-paper";
 
 export default function App() {
-    const TabNav = createBottomTabNavigator();
     return (
-        <NavigationContainer>
-            <StatusBar style="auto" />
-            <TabNav.Navigator>
-                <TabNav.Screen name="Home" component={HomeScreen} />
-            </TabNav.Navigator>
-        </NavigationContainer>
+        <PaperProvider>
+            <App />
+        </PaperProvider>
     );
 }
 
