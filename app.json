@@ -22,7 +22,8 @@
                 "foregroundImage": "./assets/adaptive_icon.png",
                 "backgroundColor": "#ffffff"
             },
-            "package": "com.rasyadanfz.PlatePerfect"
+            "package": "com.rasyadanfz.PlatePerfect",
+            "googleServicesFile": "./google-services.json"
         },
         "web": {
             "favicon": "./assets/favicon.png"

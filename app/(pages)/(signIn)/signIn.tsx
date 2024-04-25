@@ -1,19 +1,12 @@
 import { View, Text } from "react-native";
 import { Link } from "expo-router";
+import globalStyles from "../../globals/styles/globalStyles";
 
 export default function SignInPage() {
+    const styles = globalStyles;
     return (
-        <View
-            style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
-        >
-            <Text
-                style={{
-                    fontSize: 30,
-                    fontWeight: "bold",
-                }}
-            >
-                Sign In Here!
-            </Text>
+        <View style={globalStyles.container}>
+            <Text style={globalStyles.h1}>Sign In Here!</Text>
             <Link
                 href="/"
                 style={{
