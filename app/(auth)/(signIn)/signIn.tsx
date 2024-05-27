@@ -1,11 +1,11 @@
-import { Link, router } from "expo-router";
+import { View, Text, Image, StyleSheet, Alert } from "react-native";
+import { Link, Redirect, router } from "expo-router";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { Title, HelperText, TextInput, Button } from "react-native-paper";
+import appIcon from "../../../assets/adaptive_icon.png";
 import { useState } from "react";
-import { View, Text, StyleSheet, Alert } from "react-native";
-import { Button, HelperText, TextInput, Title } from "react-native-paper";
 import { useAuth } from "../../context/AuthProvider";
 import { AuthError } from "@supabase/supabase-js";
-import { Image } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const styles = StyleSheet.create({
     formContainer: {
@@ -25,31 +25,42 @@ const styles = StyleSheet.create({
     },
 });
 
-const appIcon = require("../../../assets/adaptive_icon.png");
-export default function SignUp() {
+export default function SignInPage() {
     const insets = useSafeAreaInsets();
+    const { isAuthenticated } = useAuth();
+    if (isAuthenticated) {
+        return <Redirect href="/home" />;
+    }
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [confirmPassword, setConfirmPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
-    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [formErrors, setFormErrors] = useState<{
         email: string;
         password: string;
-        confirmPassword: string;
     }>({
         email: "",
         password: "",
-        confirmPassword: "",
     });
-    const { signUp } = useAuth();
+
+    const bypassSignIn1 = async () => {
+        const user = await signIn("user123@gmail.com", "user1234", false);
+        if (user) {
+            router.replace("/home");
+        }
+    };
+    const bypassSignIn2 = async () => {
+        const user = await signIn("prof@p.com", "prof1234", false);
+        if (user) {
+            router.replace("/home");
+        }
+    };
+
+    const { signIn } = useAuth();
     const handleSignIn = async () => {
-        // Validate All Inputs
         let newErrors = {
             email: "",
             password: "",
-            confirmPassword: "",
         };
         if (!email) {
             newErrors.email = "Email is required";
@@ -61,17 +72,11 @@ export default function SignUp() {
             newErrors.password = "Password is required";
         }
 
-        if (!confirmPassword) {
-            newErrors.confirmPassword = "Password confirmation is required";
-        } else if (password !== confirmPassword) {
-            newErrors.confirmPassword = "Passwords do not match";
-        }
-
         if (Object.values(newErrors).some((error) => error !== "")) {
             setFormErrors(newErrors);
         } else {
             try {
-                const user = await signUp(email, password);
+                const user = await signIn(email, password, false);
                 if (user) {
                     router.replace("/home");
                 }
@@ -99,7 +104,7 @@ export default function SignUp() {
             </View>
             <View style={styles.formContainer}>
                 <Title style={{ marginVertical: 20, textAlign: "center", fontWeight: "bold" }}>
-                    Create your Account
+                    Login to your Account
                 </Title>
                 <View style={{ marginHorizontal: "10%" }}>
                     <TextInput
@@ -142,36 +147,19 @@ export default function SignUp() {
                     >
                         {formErrors.password}
                     </HelperText>
-                    <TextInput
-                        label="Confirm Password"
-                        left={<TextInput.Icon icon="lock" />}
-                        right={
-                            <TextInput.Icon
-                                icon={showConfirmPassword ? "eye-off" : "eye"}
-                                onPress={() => setShowConfirmPassword(!showConfirmPassword)}
-                            />
-                        }
-                        secureTextEntry={!showConfirmPassword}
-                        mode="outlined"
-                        onChangeText={(confirmPassword) => {
-                            setConfirmPassword(confirmPassword);
-                            setFormErrors((formErrors) => ({ ...formErrors, confirmPassword: "" }));
-                        }}
-                    />
-                    <HelperText
-                        type="error"
-                        visible={formErrors.confirmPassword !== ""}
-                        style={styles.helperTextContainer}
-                    >
-                        {formErrors.confirmPassword}
-                    </HelperText>
                     <Button mode="contained" onPress={handleSignIn}>
-                        Sign Up
+                        Sign In
                     </Button>
 
-                    <Link href="/signIn" style={{ marginTop: 10, textDecorationLine: "underline" }}>
-                        Already have an account?
+                    <Link href="/signUp" style={{ marginTop: 10, textDecorationLine: "underline" }}>
+                        Don't have an account?
                     </Link>
+                    <Button mode="contained" onPress={bypassSignIn1}>
+                        Bypass User
+                    </Button>
+                    <Button mode="contained" onPress={bypassSignIn2} style={{ marginTop: 10 }}>
+                        Bypass Professional
+                    </Button>
                 </View>
             </View>
         </View>

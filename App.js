@@ -1,5 +1,4 @@
 import { StatusBar, StyleSheet } from "react-native";
-import App from "./App";
 import { PaperProvider } from "react-native-paper";
 
 export default function App() {

@@ -1,12 +1,19 @@
 import React, { useState, useEffect } from "react";
-import { supabase } from "../db/supabaseClient";
-import { User } from "@supabase/supabase-js";
+import * as SecureStore from "expo-secure-store";
+import axios from "axios";
+import { BACKEND_URL } from "@env";
+import { jwtDecode } from "jwt-decode";
+import { Professional, User } from "../../types/dbTypes";
 
 interface contextInterface {
-    user: User | null;
-    signUp: (email: string, password: string) => Promise<User | null | undefined>;
-    signIn: (email: string, password: string) => Promise<User | undefined>;
-    signOut: () => Promise<any>;
+    user: User | Professional | null | undefined;
+    isAuthenticated: boolean;
+    accessToken: string | null;
+    role: string;
+    signUp: (email: string, password: string, isProfessional: boolean) => Promise<boolean>;
+    signIn: (email: string, password: string, isProfessional: boolean) => Promise<boolean>;
+    signOut: () => Promise<boolean>;
+    fetchUserData: () => Promise<void>;
 }
 
 const AuthContext = React.createContext({} as contextInterface);
@@ -16,57 +23,189 @@ const useAuth = () => {
 };
 
 const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-    const [user, setUser] = useState<any>(null);
-    const [loading, setLoading] = useState(true);
+    const [role, setRole] = useState("USER");
+    const [user, setUser] = useState<User | Professional | null | undefined>();
+    const [accessToken, setAccessToken] = useState<string | null>("");
+    const [refreshToken, setRefreshToken] = useState<string | null>("");
+    const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
 
     useEffect(() => {
-        const getCurrentSession = async () => {
-            const { data, error } = await supabase.auth.getSession();
-            setUser(data?.session?.user ?? null);
-            setLoading(false);
+        const initAuth = async () => {
+            const storedAccessToken = await SecureStore.getItemAsync("accessToken");
+            const storedRefreshToken = await SecureStore.getItemAsync("refreshToken");
 
-            const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
-                setUser(session?.user ?? null);
-                setLoading(false);
-            });
-
-            authListener.subscription.unsubscribe();
+            if (storedAccessToken && storedRefreshToken) {
+                setAccessToken(storedAccessToken);
+                setRefreshToken(storedRefreshToken);
+                setIsAuthenticated(true);
+                await checkTokenExpiration(storedAccessToken);
+            }
         };
-        getCurrentSession();
+
+        initAuth();
+
+        return () => {
+            // cleanup
+            clearTimeout;
+        };
     }, []);
 
-    const signUp = async (email: string, password: string) => {
-        const { data, error } = await supabase.auth.signUp({ email: email, password: password });
-        if (error) {
-            throw error;
+    const signUp = async (email: string, password: string, isProfessional: boolean) => {
+        const backendRegister = await axios({
+            method: "POST",
+            url: `${BACKEND_URL}/api/auth/register`,
+            data: { email: email, password: password, isProfessional: isProfessional },
+        });
+
+        if (backendRegister.status === 200) {
+            return true;
         } else {
-            return data.user;
+            return false;
         }
     };
 
-    const signIn = async (email: string, password: string) => {
-        const { data, error } = await supabase.auth.signInWithPassword({
-            email: email,
-            password: password,
-        });
-        if (error) {
-            throw error;
-        } else {
-            setUser(data.user);
-            return data.user;
+    const signIn = async (email: string, password: string, isProfessional: boolean) => {
+        try {
+            const backendLogin = await axios({
+                method: "POST",
+                url: `${BACKEND_URL}/api/auth/login`,
+                data: { email: email, password: password, isProfessional: isProfessional },
+            });
+
+            if (backendLogin.status === 200) {
+                const accessToken = backendLogin.data.token;
+                const refreshToken = backendLogin.data.refreshToken;
+                await saveTokens(accessToken, refreshToken);
+                setAccessToken(accessToken);
+                setRefreshToken(refreshToken);
+                setIsAuthenticated(true);
+                checkTokenExpiration(accessToken);
+                return true;
+            } else {
+                return false;
+            }
+        } catch (error) {
+            console.log("SIGNIN ERROR: ", error);
+            return false;
         }
     };
 
     const signOut = async () => {
-        const { error } = await supabase.auth.signOut();
-        if (error) {
-            console.log("Error signing out: ", error);
+        const refreshToken = await SecureStore.getItemAsync("refreshToken");
+        const accessToken = await SecureStore.getItemAsync("accessToken");
+
+        try {
+            const backendSignOut = await axios({
+                method: "POST",
+                url: `${BACKEND_URL}/api/auth/logout`,
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${accessToken}`,
+                },
+                data: {
+                    token: refreshToken,
+                },
+            });
+
+            if (backendSignOut.status === 204) {
+                setAccessToken(null);
+                setRefreshToken(null);
+                setIsAuthenticated(false);
+                setUser(null);
+                await SecureStore.deleteItemAsync("accessToken");
+                await SecureStore.deleteItemAsync("refreshToken");
+                return true;
+            } else {
+                return false;
+            }
+        } catch (error) {
+            console.log(error);
+            return false;
+        }
+    };
+
+    const checkTokenExpiration = async (accessToken: string) => {
+        const decoded = jwtDecode(accessToken);
+        const currentTime = Math.floor(Date.now() / 1000);
+        try {
+            if (decoded.exp! < currentTime) {
+                // Token is expired
+                const newAccessToken = await refreshAccessToken(refreshToken as string);
+                if (newAccessToken) {
+                    setAccessToken(newAccessToken);
+                    await SecureStore.setItemAsync("accessToken", newAccessToken);
+                    checkTokenExpiration(newAccessToken);
+                } else {
+                    const signedOut = await signOut();
+                }
+            } else {
+                const timeout = (decoded.exp! - currentTime - 60) * 1000; // 1 Minute before token expiration
+                setTimeout(() => checkTokenExpiration(accessToken), timeout);
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+    const fetchUserData = async (diffAccessToken?: string) => {
+        try {
+            const user = await axios({
+                method: "GET",
+                url: `${BACKEND_URL}/api/auth/me`,
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${diffAccessToken ? diffAccessToken : accessToken}`,
+                },
+            });
+            console.log("FETCH USER DATA:", user.data);
+            if (user.data.role == "USER") {
+                setRole("USER");
+                setUser(user.data.data as User);
+            } else if (user.data.role == "PROFESSIONAL") {
+                setRole("PROFESSIONAL");
+                setUser(user.data.data as Professional);
+            }
+        } catch (error) {
+            console.log("FETCH USER DATA ERROR: ", error);
         }
     };
 
     return (
-        <AuthContext.Provider value={{ user, signUp, signIn, signOut }}>{children}</AuthContext.Provider>
+        <AuthContext.Provider
+            value={{ signUp, signIn, signOut, fetchUserData, user, isAuthenticated, accessToken, role }}
+        >
+            {children}
+        </AuthContext.Provider>
     );
+};
+
+const saveTokens = async (accessToken: string, refreshToken: string) => {
+    await SecureStore.setItemAsync("accessToken", accessToken);
+    await SecureStore.setItemAsync("refreshToken", refreshToken);
+};
+
+const refreshAccessToken = async (refreshToken: string) => {
+    try {
+        const response = await axios({
+            method: "POST",
+            url: `${BACKEND_URL}/api/auth/token`,
+            headers: {
+                "Content-Type": "application/json",
+            },
+            data: {
+                token: refreshToken,
+            },
+        });
+
+        const data = response.data;
+        if (data.accessToken) {
+            await SecureStore.setItemAsync("accessToken", data.accessToken);
+            return data.accessToken;
+        }
+    } catch (error) {
+        console.log(error);
+    }
+    return null;
 };
 
 export default AuthProvider;
