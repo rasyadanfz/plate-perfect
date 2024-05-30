@@ -20,7 +20,14 @@ export default function StackLayout() {
 
     return (
         <Stack>
-            <Stack.Screen name="index" options={{ headerTitle: "Home" }} />
+            <Stack.Screen
+                name="index"
+                options={{
+                    headerTitle: "Home",
+                    headerStyle: { backgroundColor: "#404c4c" },
+                    headerTintColor: "white",
+                }}
+            />
         </Stack>
     );
 }

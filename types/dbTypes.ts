@@ -42,6 +42,7 @@ export type User = {
 export type Professional = {
     professional_id: string;
     name: string;
+    description: string;
     role: ProfessionalRole;
     email: string;
     phone_num?: string;

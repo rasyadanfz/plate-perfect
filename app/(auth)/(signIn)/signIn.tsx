@@ -151,7 +151,15 @@ export default function SignInPage() {
                         Sign In
                     </Button>
 
-                    <Link href="/signUp" style={{ marginTop: 10, textDecorationLine: "underline" }}>
+                    <Link
+                        href="/signUp"
+                        style={{
+                            marginTop: 15,
+                            marginBottom: 50,
+                            textDecorationLine: "underline",
+                            textAlign: "center",
+                        }}
+                    >
                         Don't have an account?
                     </Link>
                     <Button mode="contained" onPress={bypassSignIn1}>

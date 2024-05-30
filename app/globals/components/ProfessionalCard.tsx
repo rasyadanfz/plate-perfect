@@ -3,22 +3,20 @@ import { Button, Text } from "react-native-paper";
 
 const style = StyleSheet.create({
     container: {
-        flex: 1,
         flexDirection: "row",
         backgroundColor: "#f6ae0a",
         paddingVertical: 15,
         paddingHorizontal: 10,
         borderRadius: 10,
-        alignItems: "flex-start",
+        alignItems: "center",
     },
     descContainer: {
         flex: 1,
-        justifyContent: "flex-start",
         marginLeft: 15,
     },
     image: {
-        width: 80,
-        height: 100,
+        width: 64,
+        height: 80,
         borderColor: "black",
         borderWidth: 1,
         borderRadius: 10,
@@ -33,7 +31,7 @@ const style = StyleSheet.create({
         justifyContent: "center",
     },
     button: {
-        height: "100%",
+        backgroundColor: "#ecca9c",
     },
 });
 
@@ -45,23 +43,22 @@ export default function ProfessionalCard(props: ProfessionalProps) {
     return (
         <View style={style.container}>
             <View style={style.imageContainer}>
-                <Image source={require("../../../assets/chef-ed.jpg")} style={style.image} />
+                <Image source={require("../../../assets/chefv2.png")} style={style.image} />
             </View>
             <View style={style.descContainer}>
-                <View>
-                    <View style={style.desc}>
+                <View style={style.desc}>
+                    <View>
                         <Text>{name}</Text>
-                        <Button
-                            mode="contained"
-                            style={style.button}
-                            labelStyle={{ fontSize: 8, lineHeight: 10 }}
-                        >
-                            Detail
-                        </Button>
+                        <Text style={{ fontSize: 10 }}>Chef de Cuisine</Text>
                     </View>
-                    <Text style={{ fontSize: 10 }}>Chef de Cuisine</Text>
+                    <Button
+                        mode="contained"
+                        style={style.button}
+                        labelStyle={{ fontSize: 10, lineHeight: 10, color: "black" }}
+                    >
+                        Book &gt;
+                    </Button>
                 </View>
-                <View></View>
             </View>
         </View>
     );

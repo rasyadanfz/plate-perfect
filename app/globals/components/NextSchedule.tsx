@@ -34,15 +34,15 @@ const style = StyleSheet.create({
         marginTop: 20,
     },
     buttonText: {
-        color: "white",
-        fontSize: 9,
-        lineHeight: 9,
+        color: "black",
+        fontSize: 10,
+        lineHeight: 10,
     },
 });
 
 function ConsultButton() {
     return (
-        <Button mode="contained" labelStyle={style.buttonText}>
+        <Button mode="contained" style={{ backgroundColor: "#ecca9c" }} labelStyle={style.buttonText}>
             Consult &gt;
         </Button>
     );
@@ -55,22 +55,50 @@ function DetailCard({ text }: { text: string }) {
         </View>
     );
 }
-export default function NextSchedule() {
-    return (
-        <View style={style.container}>
-            <View style={style.desc}>
-                <View style={style.title}>
-                    <Text style={{ fontSize: 14 }}>Konsultasi Masakan</Text>
-                    <Text style={{ fontSize: 11 }}>H. Ben Edict</Text>
+export default function NextSchedule({
+    role,
+    title,
+    clientOrProfessionalName,
+}: {
+    role: string;
+    title: string;
+    clientOrProfessionalName: string;
+}) {
+    if (role.toLowerCase() === "user") {
+        return (
+            <View style={style.container}>
+                <View style={style.desc}>
+                    <View style={style.title}>
+                        <Text style={{ fontSize: 14 }}>{title}</Text>
+                        <Text style={{ fontSize: 11 }}>{clientOrProfessionalName}</Text>
+                    </View>
+                    <View>
+                        <ConsultButton />
+                    </View>
                 </View>
-                <View>
-                    <ConsultButton />
+                <View style={style.detailContainer}>
+                    <DetailCard text="45 Minute" />
+                    <Text style={{ fontSize: 15, fontWeight: "bold" }}>13:00</Text>
                 </View>
             </View>
-            <View style={style.detailContainer}>
-                <DetailCard text="45 Minute" />
-                <Text style={{ fontSize: 15, fontWeight: "bold" }}>13:00</Text>
+        );
+    } else {
+        return (
+            <View style={style.container}>
+                <View style={style.desc}>
+                    <View style={style.title}>
+                        <Text style={{ fontSize: 14 }}>{title}</Text>
+                        <Text style={{ fontSize: 11 }}>Client: {clientOrProfessionalName}</Text>
+                    </View>
+                    <View>
+                        <ConsultButton />
+                    </View>
+                </View>
+                <View style={style.detailContainer}>
+                    <DetailCard text="45 Minute" />
+                    <Text style={{ fontSize: 15, fontWeight: "bold" }}>13:00</Text>
+                </View>
             </View>
-        </View>
-    );
+        );
+    }
 }

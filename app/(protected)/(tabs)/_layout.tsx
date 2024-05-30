@@ -4,7 +4,12 @@ import { useAuth } from "../../context/AuthProvider";
 
 export default function TabLayout() {
     return (
-        <Tabs screenOptions={{ tabBarActiveTintColor: "black" }}>
+        <Tabs
+            screenOptions={{
+                tabBarActiveTintColor: "black",
+                tabBarStyle: { backgroundColor: "#dba979", height: 53, paddingBottom: 3 },
+            }}
+        >
             <Tabs.Screen
                 name="home"
                 options={{

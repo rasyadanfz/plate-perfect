@@ -187,7 +187,10 @@ export default function SignUp() {
                         Sign Up
                     </Button>
 
-                    <Link href="/signIn" style={{ marginTop: 10, textDecorationLine: "underline" }}>
+                    <Link
+                        href="/signIn"
+                        style={{ marginTop: 15, textDecorationLine: "underline", textAlign: "center" }}
+                    >
                         Already have an account?
                     </Link>
                 </View>

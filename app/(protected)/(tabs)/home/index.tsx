@@ -1,4 +1,4 @@
-import { Link } from "expo-router";
+import { Link, Redirect, router } from "expo-router";
 import { ScrollView, StyleSheet, View } from "react-native";
 import { Text } from "react-native-paper";
 import { Button } from "react-native-paper";
@@ -7,9 +7,10 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import ProfessionalCard from "../../../globals/components/ProfessionalCard";
 import HistoryCard from "../../../globals/components/HistoryCard";
 import NextSchedule from "../../../globals/components/NextSchedule";
+import { Professional, User } from "../../../../types/dbTypes";
 
 export default function Home() {
-    const { user } = useAuth();
+    const { user, role } = useAuth();
     const safeInsets = useSafeAreaInsets();
 
     const style = StyleSheet.create({
@@ -17,6 +18,8 @@ export default function Home() {
             paddingTop: safeInsets.top - 10,
             paddingLeft: safeInsets.left + 20,
             paddingRight: safeInsets.right + 20,
+            paddingBottom: 30,
+            backgroundColor: "#e8efcf",
             flex: 1,
             rowGap: 20,
         },
@@ -44,37 +47,92 @@ export default function Home() {
             fontWeight: "bold",
             marginBottom: 5,
         },
+        button: {},
     });
 
-    return (
-        <ScrollView style={style.container}>
-            <View style={{ marginBottom: 20 }}>
-                <Text style={style.title}>Hi {user?.name} !</Text>
-            </View>
-            <View style={style.sectionContainer}>
-                <View style={style.section}>
-                    <Text style={style.subtitle}>Our Professionals</Text>
-                    <Button mode="contained" labelStyle={{ fontSize: 9, lineHeight: 9 }}>
-                        See All
-                    </Button>
+    if (role === "USER") {
+        const userData = user as User;
+        return (
+            <ScrollView style={style.container}>
+                <View style={{ marginBottom: 20 }}>
+                    <Text style={style.title}>Hi {userData.name} !</Text>
                 </View>
-                <Text style={style.sectionItem}>Here are our professional recommendation for you!</Text>
-                <ProfessionalCard name="H. Ben Edict" />
-            </View>
-            <View style={style.sectionContainer}>
-                <View style={style.section}>
-                    <Text style={style.subtitle}>Consultation History</Text>
-                    <Button mode="contained" labelStyle={{ fontSize: 9, lineHeight: 9 }}>
-                        See All
-                    </Button>
+                <View style={style.sectionContainer}>
+                    <View style={style.section}>
+                        <Text style={style.subtitle}>Our Professionals</Text>
+                        <Button
+                            mode="contained"
+                            style={{ backgroundColor: "#ecca9c" }}
+                            labelStyle={{ fontSize: 10, lineHeight: 10, color: "black" }}
+                        >
+                            See All
+                        </Button>
+                    </View>
+                    <Text style={style.sectionItem}>
+                        Here are our professional recommendation for you!
+                    </Text>
+                    <ProfessionalCard name="H. Ben Edict" />
                 </View>
-                <Text style={style.sectionItem}>Your last consultation history</Text>
-                <HistoryCard />
-            </View>
-            <View style={style.sectionContainer}>
-                <Text style={style.subtitle}>Next Schedule</Text>
-                <NextSchedule />
-            </View>
-        </ScrollView>
-    );
+                <View style={style.sectionContainer}>
+                    <View style={style.section}>
+                        <Text style={style.subtitle}>Consultation History</Text>
+                        <Button
+                            mode="contained"
+                            style={{ backgroundColor: "#ecca9c" }}
+                            labelStyle={{ fontSize: 10, lineHeight: 10, color: "black" }}
+                        >
+                            See All
+                        </Button>
+                    </View>
+                    <Text style={style.sectionItem}>Your last consultation history</Text>
+                    <HistoryCard role="USER" />
+                </View>
+                <View style={style.sectionContainer}>
+                    <Text style={style.subtitle}>Next Schedule</Text>
+                    <NextSchedule
+                        role="USER"
+                        title="Konsultasi Masakan"
+                        clientOrProfessionalName="Dr. H. Ben Edict"
+                    />
+                </View>
+                <Button mode="contained" onPress={() => router.push("/summary")}>
+                    Summary
+                </Button>
+            </ScrollView>
+        );
+    } else {
+        const userData = user as Professional;
+        return (
+            <ScrollView style={style.container}>
+                <View style={{ marginBottom: 20 }}>
+                    <Text style={style.title}>Hi {userData.name} !</Text>
+                </View>
+                <View style={style.sectionContainer}>
+                    <View style={style.section}>
+                        <Text style={style.subtitle}>Consultation History</Text>
+                        <Button
+                            mode="contained"
+                            style={{ backgroundColor: "#ecca9c" }}
+                            labelStyle={{ fontSize: 10, lineHeight: 10, color: "black" }}
+                        >
+                            See All
+                        </Button>
+                    </View>
+                    <Text style={style.sectionItem}>Your last consultation history</Text>
+                    <HistoryCard role="PROFESSIONAL" />
+                </View>
+                <View style={style.sectionContainer}>
+                    <Text style={style.subtitle}>Next Schedule</Text>
+                    <NextSchedule
+                        role="PROFESSIONAL"
+                        title="Konsultasi Masakan"
+                        clientOrProfessionalName="Hugo Benedicto"
+                    />
+                </View>
+                <Button mode="contained" onPress={() => router.push("/summary")}>
+                    Summary
+                </Button>
+            </ScrollView>
+        );
+    }
 }

@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
 import * as SecureStore from "expo-secure-store";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { BACKEND_URL } from "@env";
 import { jwtDecode } from "jwt-decode";
 import { Professional, User } from "../../types/dbTypes";
+import { Redirect } from "expo-router";
 
 interface contextInterface {
     user: User | Professional | null | undefined;
@@ -203,7 +204,11 @@ const refreshAccessToken = async (refreshToken: string) => {
             return data.accessToken;
         }
     } catch (error) {
-        console.log(error);
+        if ((error as AxiosError).response!.status === 403) {
+            console.log("HEREE");
+            return <Redirect href="/signIn" />;
+        }
+        console.log("Refresh Access Token Error: ", error);
     }
     return null;
 };

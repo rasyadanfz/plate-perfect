@@ -147,7 +147,7 @@ function ProfileCompletion() {
 
     return (
         <View style={style.container}>
-            <ScrollView>
+            <ScrollView style={{ paddingHorizontal: 25 }}>
                 <Text style={style.title}>Hello!</Text>
                 <Text style={style.subtitle}>
                     Welcome to PlatePerfect! To get started, we'd love to get to know you better.
@@ -157,7 +157,12 @@ function ProfileCompletion() {
                 {fields.map((field) => {
                     return profileDataComponent(field, getSetter(field), getGetter(field), style);
                 })}
-                <Button mode="contained" style={{ marginTop: 10 }} onPress={handleSaveProfile}>
+                <Button
+                    mode="contained"
+                    style={{ marginTop: 10, backgroundColor: "#ecca9c" }}
+                    labelStyle={{ color: "black" }}
+                    onPress={handleSaveProfile}
+                >
                     Save Profile
                 </Button>
                 <View
@@ -167,7 +172,12 @@ function ProfileCompletion() {
                     <Text style={{ textAlign: "center", paddingHorizontal: 15 }}>Or</Text>
                     <View style={{ flex: 1, backgroundColor: "black", height: 0.5 }}></View>
                 </View>
-                <Button mode="contained" onPress={handleLogout}>
+                <Button
+                    mode="contained"
+                    onPress={handleLogout}
+                    style={{ backgroundColor: "#ecca9c" }}
+                    labelStyle={{ color: "black" }}
+                >
                     Back to Login Screen
                 </Button>
             </ScrollView>
@@ -236,9 +246,9 @@ const styleProfileCompletion = (insets: EdgeInsets) =>
         container: {
             flex: 1,
             justifyContent: "flex-start",
-            paddingHorizontal: 10,
             paddingTop: insets.top + 30,
             paddingBottom: 10,
+            backgroundColor: "#e8efcf",
         },
         title: {
             fontSize: 32,
