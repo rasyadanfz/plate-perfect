@@ -23,8 +23,15 @@ export default function ProtectedLayout() {
 
     if (!user) {
         return (
-            <View>
-                <Text>Loading...</Text>
+            <View
+                style={{
+                    flex: 1,
+                    justifyContent: "center",
+                    alignItems: "center",
+                    backgroundColor: "#eda80c",
+                }}
+            >
+                <Text style={{ fontSize: 20 }}>Loading...</Text>
             </View>
         );
     }
