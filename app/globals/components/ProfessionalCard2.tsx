@@ -84,7 +84,7 @@ export default function ProfessionalCard2(props: Professional) {
                         </View>
                         <View style={style.chipContainer}>
                             <Icon name="ribbon-outline" size={16} color="black" /> 
-                             <Text style={style.chipText}>512</Text>
+                             <Text style={style.chipText}>{props.experience}</Text>
                         </View>
                 </View>
             </View>
