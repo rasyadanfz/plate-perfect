@@ -1,5 +1,7 @@
 import { Image, StyleSheet, View } from "react-native";
 import { Button, Text } from "react-native-paper";
+import React from "react";
+import { Redirect, router } from "expo-router";
 
 const style = StyleSheet.create({
     container: {
@@ -55,6 +57,9 @@ export default function ProfessionalCard(props: ProfessionalProps) {
                         mode="contained"
                         style={style.button}
                         labelStyle={{ fontSize: 10, lineHeight: 10, color: "black" }}
+                        onPress={()=>{
+                            router.push("/booking");
+                        }}
                     >
                         Book &gt;
                     </Button>

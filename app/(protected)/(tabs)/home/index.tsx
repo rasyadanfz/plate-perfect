@@ -8,6 +8,7 @@ import ProfessionalCard from "../../../globals/components/ProfessionalCard";
 import HistoryCard from "../../../globals/components/HistoryCard";
 import NextSchedule from "../../../globals/components/NextSchedule";
 import { Professional, User } from "../../../../types/dbTypes";
+import React from "react";
 
 export default function Home() {
     const { user, role } = useAuth();

@@ -6,6 +6,7 @@ import { useAuth } from "../../context/AuthProvider";
 import { BACKEND_URL } from "@env";
 import axios from "axios";
 import { router } from "expo-router";
+import React from "react";
 
 export default function ProfileCompletionProfessional() {
     const { accessToken, fetchUserData, signOut } = useAuth();

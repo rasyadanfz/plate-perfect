@@ -3,6 +3,7 @@ import { useAuth } from "../context/AuthProvider";
 import { useEffect } from "react";
 import { View } from "react-native";
 import { Text } from "react-native-paper";
+import React from "react";
 
 export default function ProtectedLayout() {
     const { signOut, fetchUserData, isAuthenticated, user, accessToken } = useAuth();
