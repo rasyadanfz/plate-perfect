@@ -79,12 +79,12 @@ export default function ProfessionalCard2(props: Professional) {
                 </View>
                 <View style={style.chipsContainer}>
                         <View style={style.chipContainer}>
-                            <Icon name="chef-hat" size={16} color="black" /> 
+                            <Icon name="people-circle-outline" size={16} color="black" /> 
                              <Text style={style.chipText}>Vegetarian</Text>
                         </View>
                         <View style={style.chipContainer}>
-                            <Icon name="people-circle-outline" size={16} color="black" /> 
-                             <Text style={style.chipText}>Vegetarian</Text>
+                            <Icon name="ribbon-outline" size={16} color="black" /> 
+                             <Text style={style.chipText}>512</Text>
                         </View>
                 </View>
             </View>
