@@ -14,7 +14,10 @@ import { Professional, ProfessionalRole } from "../../../types/dbTypes";
   const availableDates: IAvailableDates[] = [
     {
       date: '2023-08-17T21:00:00.000Z', // new Date().toISOString()
-      slotTimes: ['08:00-09:00', '09:00-10:00'], // Array<string> of time slots
+      slotTimes: ['08:00-09:00', '09:00-10:00','10:00-11:00',
+        '11:00-12:00','12:00-13:00','13:00-14:00',
+        '14:00-15:00','15:00-16:00'
+      ], // Array<string> of time slots
     },
     {
       date: '2023-08-18T21:00:00.000Z',
@@ -127,6 +130,8 @@ export default function Booking(){
             <TimeSlotPicker 
               availableDates={availableDates}
               setDateOfAppointment={setDateOfAppointment}
+              timeSlotsTitle="Choose Your Appointment Time"
+              
             />
             </View>
 
