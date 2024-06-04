@@ -3,6 +3,7 @@ import { ScrollView, StyleSheet, View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import ProfessionalCard2 from "../../globals/components/ProfessionalCard2";
 import { Professional, ProfessionalRole } from "../../../types/dbTypes";
+import { router } from "expo-router";
 
   import {
     IAppointment,
@@ -12,12 +13,12 @@ import { Professional, ProfessionalRole } from "../../../types/dbTypes";
   import { useState, useEffect } from "react";
 import ContinueButton from "../../globals/components/ContinueButton";
 
-  const availableDates: IAvailableDates[] = [
+  const availableDates: IAvailableDates[] = [  // CHANGE THIS
     {
       date: '2023-08-17T21:00:00.000Z', // new Date().toISOString()
       slotTimes: ['08:00-09:00', '09:00-10:00','10:00-11:00',
         '11:00-12:00','12:00-13:00','13:00-14:00',
-        '14:00-15:00','15:00-16:00'
+        '14:00-15:00','15:00-16:00','16:00-17:00',
       ], // Array<string> of time slots
     },
     {
@@ -29,6 +30,8 @@ import ContinueButton from "../../globals/components/ContinueButton";
       slotTimes: ['08:00-09:00', '09:00-10:00'],
     },
   ];    
+
+
 
 export default function Booking(){
   
@@ -135,7 +138,10 @@ export default function Booking(){
               
             />
             </View>
-            <ContinueButton title="Continue"/>
+            <ContinueButton title="Continue" onPress={()=>{router.push({
+              "pathname":"/bookingDetails",
+              
+            })}}/>
 
                 
 
