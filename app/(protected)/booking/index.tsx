@@ -1,12 +1,30 @@
-import React from "react";
-import { StyleSheet, View } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import React, { Fragment } from "react";
+import { ScrollView, StyleSheet, View } from "react-native";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import ProfessionalCard2 from "../../globals/components/ProfessionalCard2";
 import { Professional, ProfessionalRole } from "../../../types/dbTypes";
-import { DatePickerModal } from "react-native-paper-dates";
-import { Button } from "react-native-paper";
-import { SafeAreaProvider } from "react-native-safe-area-context";
 
+  import {
+    IAppointment,
+    IAvailableDates,
+    TimeSlotPicker,
+  } from '@dgreasi/react-native-time-slot-picker';
+  import { useState, useEffect } from "react";
+
+  const availableDates: IAvailableDates[] = [
+    {
+      date: '2023-08-17T21:00:00.000Z', // new Date().toISOString()
+      slotTimes: ['08:00-09:00', '09:00-10:00'], // Array<string> of time slots
+    },
+    {
+      date: '2023-08-18T21:00:00.000Z',
+      slotTimes: [], // No availability
+    },
+    {
+      date: '2023-08-19T21:00:00.000Z',
+      slotTimes: ['08:00-09:00', '09:00-10:00'],
+    },
+  ];    
 
 export default function Booking(){
   
@@ -45,12 +63,14 @@ export default function Booking(){
             fontWeight: "bold",
             marginBottom: 5,
         },
-        button: {},
+        timeSlotContainer:{
+          marginTop:20,
+        }
     });
 
     const tempoChef:Professional = {
         professional_id: "1",
-        name: "Benedict",
+        name: "Benedicttt",
         description: "A Chef",
         role: ProfessionalRole.CHEF,
         email: "testing1233@gmail.com",
@@ -78,25 +98,41 @@ export default function Booking(){
       [setOpen, setDate]
     );
 
+    const [dateOfAppointment, setDateOfAppointment] =
+    useState<IAppointment | null>(null);
+
+    useEffect(()=>{
+      console.log(dateOfAppointment)
+    },[])
 
     return (
-        <View style={style.container}>
+
+        <ScrollView style={style.container}>
             <ProfessionalCard2 {...tempoChef}/>
-                    <SafeAreaProvider>
+            {/*
                     <Button onPress={() => setOpen(true)} uppercase={false} mode="outlined">
                                     {date ? (date as Date).toDateString() : "Pick a date"} 
                     </Button>
-            <DatePickerModal
-                locale="en"
+                <DatePickerModal
+                     locale="en"
                 mode="single"
                 visible={open}
                 onDismiss={onDismissSingle}
                 date={date}
                 onConfirm={onConfirmSingle}
+                
+                />
+              */}
+              <View style={style.timeSlotContainer}>
+            <TimeSlotPicker 
+              availableDates={availableDates}
+              setDateOfAppointment={setDateOfAppointment}
             />
-                    </SafeAreaProvider> 
+            </View>
+
+                
+
             
-            
-        </View>
-    )
+        </ScrollView>
+    )   
 }
