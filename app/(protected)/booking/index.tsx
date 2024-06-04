@@ -10,6 +10,7 @@ import { Professional, ProfessionalRole } from "../../../types/dbTypes";
     TimeSlotPicker,
   } from '@dgreasi/react-native-time-slot-picker';
   import { useState, useEffect } from "react";
+import ContinueButton from "../../globals/components/ContinueButton";
 
   const availableDates: IAvailableDates[] = [
     {
@@ -67,7 +68,7 @@ export default function Booking(){
             marginBottom: 5,
         },
         timeSlotContainer:{
-          marginTop:20,
+          marginVertical:20,
         }
     });
 
@@ -134,6 +135,7 @@ export default function Booking(){
               
             />
             </View>
+            <ContinueButton title="Continue"/>
 
                 
 
