@@ -3,7 +3,11 @@ import { ScrollView, StyleSheet, View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import ProfessionalCard2 from "../../globals/components/ProfessionalCard2";
 import { Professional, ProfessionalRole } from "../../../types/dbTypes";
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
+import axios from "axios";
+import { BACKEND_URL } from "@env";
+import { Text } from "react-native-paper";
+
 
   import {
     IAppointment,
@@ -12,15 +16,10 @@ import { router } from "expo-router";
   } from '@dgreasi/react-native-time-slot-picker';
   import { useState, useEffect } from "react";
 import ContinueButton from "../../globals/components/ContinueButton";
+import { Consumer } from "react-native-paper/lib/typescript/core/settings";
+import { useAuth } from "../../context/AuthProvider";
 
   const availableDates: IAvailableDates[] = [  // CHANGE THIS
-    {
-      date: '2023-08-17T21:00:00.000Z', // new Date().toISOString()
-      slotTimes: ['08:00-09:00', '09:00-10:00','10:00-11:00',
-        '11:00-12:00','12:00-13:00','13:00-14:00',
-        '14:00-15:00','15:00-16:00','16:00-17:00',
-      ], // Array<string> of time slots
-    },
     {
       date: '2023-08-18T21:00:00.000Z',
       slotTimes: [], // No availability
@@ -31,10 +30,73 @@ import ContinueButton from "../../globals/components/ContinueButton";
     },
   ];    
 
+  const tempoChef:Professional = {
+    professional_id: "1",
+    name: "Benedicttt",
+    description: "A Chef",
+    role: ProfessionalRole.CHEF,
+    email: "testing1233@gmail.com",
+    phone_num: "191919",
+    balance: 123,
+    experience: 123,
+    consultations: [],
+    chat_messages: [],
+    summary: [],
+    hasCompletedData: true
+  }
+
+function fetchAvailableDates() {
+  availableDates.push(    {
+    date: '2023-08-17T21:00:00.000Z', // new Date().toISOString()
+    slotTimes: ['08:00-09:00', '09:00-10:00','10:00-11:00',
+      '11:00-12:00','12:00-13:00','13:00-14:00',
+      '14:00-15:00','15:00-16:00','16:00-17:00',
+    ], // Array<string> of time slots
+  })
+
+
+  const allConsultationData = async () =>{
+    try{
+      const backendResponse =  await axios({
+          method:"GET",
+          headers:{
+            Authorization:`Bearer ${useAuth().accessToken}`
+          },
+          url:`${BACKEND_URL}/api/consultation/allConsultation`,
+          params:{
+            ID : tempoChef.professional_id,
+          }
+      })
+      return backendResponse.data;
+    }catch(error){
+      return error;
+    }
+  }
+
+}
+
 
 
 export default function Booking(){
+
+  const [tempProfessional, setTempProfessional] = React.useState<Professional>();
+  const fetchProfessional = useLocalSearchParams();
+  useEffect(()=>{
+
+    const {professional} = fetchProfessional;
+    let deserializedProfessional:Professional;
+    if(professional){
+        deserializedProfessional = JSON.parse(professional as string);
+        setTempProfessional(deserializedProfessional);
+        console.log(deserializedProfessional)
+    }
+    
+  },[])
   
+
+  
+  availableDates.length = 0;
+  fetchAvailableDates();
     const safeInsets = useSafeAreaInsets();
     const style = StyleSheet.create({
         container: {
@@ -75,20 +137,7 @@ export default function Booking(){
         }
     });
 
-    const tempoChef:Professional = {
-        professional_id: "1",
-        name: "Benedicttt",
-        description: "A Chef",
-        role: ProfessionalRole.CHEF,
-        email: "testing1233@gmail.com",
-        phone_num: "191919",
-        balance: 123,
-        experience: 123,
-        consultations: [],
-        chat_messages: [],
-        summary: [],
-        hasCompletedData: true
-    }
+
 
     const [date, setDate] = React.useState(undefined);
     const [open, setOpen] = React.useState(false);
@@ -109,13 +158,19 @@ export default function Booking(){
     useState<IAppointment | null>(null);
 
     useEffect(()=>{
-      console.log(dateOfAppointment)
-    },[])
+      fetchAvailableDates();
+    },[dateOfAppointment])
 
+    if(!tempProfessional){
+      return (<View>
+        <Text>Loading</Text>
+      </View>
+      )
+    }
     return (
 
         <ScrollView style={style.container}>
-            <ProfessionalCard2 {...tempoChef}/>
+            <ProfessionalCard2 {...tempProfessional}/>
             {/*
                     <Button onPress={() => setOpen(true)} uppercase={false} mode="outlined">
                                     {date ? (date as Date).toDateString() : "Pick a date"} 
@@ -139,7 +194,11 @@ export default function Booking(){
             />
             </View>
             <ContinueButton title="Continue" onPress={()=>{router.push({
-              "pathname":"/bookingDetails",
+              pathname:"/bookingDetails",
+              params:{
+                professional: JSON.stringify(tempProfessional),
+                dateOfAppointment:  JSON.stringify(dateOfAppointment)
+              },
               
             })}}/>
 

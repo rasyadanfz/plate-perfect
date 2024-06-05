@@ -63,7 +63,7 @@ const style = StyleSheet.create({
 
 });
 
-export default function ProfessionalCard2(props: Professional) {
+export default function ProfessionalCard2(props: Professional ) {
     const { name } = props;
     return (
         <View style={style.container}>
@@ -80,7 +80,7 @@ export default function ProfessionalCard2(props: Professional) {
                 <View style={style.chipsContainer}>
                         <View style={style.chipContainer}>
                             <Icon name="people-circle-outline" size={16} color="black" /> 
-                             <Text style={style.chipText}>Vegetarian</Text>
+                             <Text style={style.chipText}>{props.role}</Text>
                         </View>
                         <View style={style.chipContainer}>
                             <Icon name="ribbon-outline" size={16} color="black" /> 
