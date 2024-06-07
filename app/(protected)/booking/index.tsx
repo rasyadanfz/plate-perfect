@@ -111,15 +111,12 @@ export default function Booking(){
       setAvailableDates(dates);
     }, []); 
   
-    const handleDateChange = useCallback((date: string) => {
-      setSelectedDate(date);
-    }, [])
-  
-    const setDateOfAppointment = useCallback((appointment: IAppointment | null) => {
-      if (appointment) {
-        handleDateChange(appointment.appointmentDate); // Trigger your custom handler
-      }
-    }, [handleDateChange]);
+
+
+    const [dateOfAppointment,setDateOfAppointment] = useState<IAppointment |null>( null);
+
+
+
 
     if(!tempProfessional){
       return (<View>
@@ -142,7 +139,7 @@ export default function Booking(){
               pathname:"/bookingDetails",
               params:{
                 professional: JSON.stringify(tempProfessional),
-              //  dateOfAppointment:  JSON.stringify(dateOfAppointment)
+                dateOfAppointment:  JSON.stringify(dateOfAppointment)
               },
               
             })}}/>

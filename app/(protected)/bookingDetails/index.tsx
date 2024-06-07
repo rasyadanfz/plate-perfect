@@ -11,6 +11,7 @@ import ProfessionalCard2 from "../../globals/components/ProfessionalCard2";
 import { useState } from "react";
 import { PaymentMethod } from "../../globals/components/PaymentMethod";
 import ContinueButton from "../../globals/components/ContinueButton";
+import { IAppointment } from "@dgreasi/react-native-time-slot-picker";
 
 
 
@@ -18,6 +19,7 @@ export default function bookingDetails(){
 
   
     const [tempProfessional, setTempProfessional] = React.useState<Professional>();
+    const [slotAppointment, setSlotAppointment] = React.useState<IAppointment>();
     const fetchProfessional = useLocalSearchParams();
     useEffect(()=>{
       const {professional} = fetchProfessional;
@@ -27,6 +29,14 @@ export default function bookingDetails(){
           setTempProfessional(deserializedProfessional);
       }
       
+      const {dateOfAppointment} = fetchProfessional
+      let deserializedDateOfAppointment = dateOfAppointment
+
+      if(deserializedDateOfAppointment){
+         deserializedDateOfAppointment = JSON.parse(dateOfAppointment as string);
+      }
+
+
     },[])
 
 
