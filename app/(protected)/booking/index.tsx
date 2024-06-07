@@ -7,9 +7,7 @@ import { router, useLocalSearchParams } from "expo-router";
 import axios from "axios";
 import { BACKEND_URL } from "@env";
 import { Text } from "react-native-paper";
-
-
-  import {
+import {
     IAppointment,
     IAvailableDates,
     TimeSlotPicker,
@@ -18,63 +16,25 @@ import { Text } from "react-native-paper";
 import ContinueButton from "../../globals/components/ContinueButton";
 import { Consumer } from "react-native-paper/lib/typescript/core/settings";
 import { useAuth } from "../../context/AuthProvider";
+import  moment from "moment";
+import { useCallback } from "react";
 
-  const availableDates: IAvailableDates[] = [  // CHANGE THIS
-    {
-      date: '2023-08-18T21:00:00.000Z',
-      slotTimes: [], // No availability
-    },
-    {
-      date: '2023-08-19T21:00:00.000Z',
-      slotTimes: ['08:00-09:00', '09:00-10:00'],
-    },
-  ];    
 
-  const tempoChef:Professional = {
-    professional_id: "1",
-    name: "Benedicttt",
-    description: "A Chef",
-    role: ProfessionalRole.CHEF,
-    email: "testing1233@gmail.com",
-    phone_num: "191919",
-    balance: 123,
-    experience: 123,
-    consultations: [],
-    chat_messages: [],
-    summary: [],
-    hasCompletedData: true
+function generateTimeSlots(startTime: string, endTime: string, slotDurationMinutes: number): string[] {
+  const start = moment(startTime, 'HH:mm');
+  const end = moment(endTime, 'HH:mm');
+  const slots: string[] = [];
+
+  while (start.isSameOrBefore(end)) {
+    const slotEndTime = start.clone().add(slotDurationMinutes, 'minutes');
+    slots.push(`${start.format('HH:mm')} - ${slotEndTime.format('HH:mm')}`);
+
+    // Move to the next full hour for the start of the next slot
+    start.add(1, 'hour').startOf('hour'); // Start next slot at the top of the hour
   }
 
-function fetchAvailableDates() {
-  availableDates.push(    {
-    date: '2023-08-17T21:00:00.000Z', // new Date().toISOString()
-    slotTimes: ['08:00-09:00', '09:00-10:00','10:00-11:00',
-      '11:00-12:00','12:00-13:00','13:00-14:00',
-      '14:00-15:00','15:00-16:00','16:00-17:00',
-    ], // Array<string> of time slots
-  })
-
-
-  const allConsultationData = async () =>{
-    try{
-      const backendResponse =  await axios({
-          method:"GET",
-          headers:{
-            Authorization:`Bearer ${useAuth().accessToken}`
-          },
-          url:`${BACKEND_URL}/api/consultation/allConsultation`,
-          params:{
-            ID : tempoChef.professional_id,
-          }
-      })
-      return backendResponse.data;
-    }catch(error){
-      return error;
-    }
-  }
-
+  return slots;
 }
-
 
 
 export default function Booking(){
@@ -88,15 +48,10 @@ export default function Booking(){
     if(professional){
         deserializedProfessional = JSON.parse(professional as string);
         setTempProfessional(deserializedProfessional);
-        console.log(deserializedProfessional)
     }
     
   },[])
   
-
-  
-  availableDates.length = 0;
-  fetchAvailableDates();
     const safeInsets = useSafeAreaInsets();
     const style = StyleSheet.create({
         container: {
@@ -136,30 +91,35 @@ export default function Booking(){
           marginVertical:20,
         }
     });
-
-
-
-    const [date, setDate] = React.useState(undefined);
-    const [open, setOpen] = React.useState(false);
+    
+    const [availableDates, setAvailableDates] = useState<IAvailableDates[]>([]);
+    const [selectedDate, setSelectedDate] = useState<string | null>(null);
+    const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
   
-    const onDismissSingle = React.useCallback(() => {
-      setOpen(false);
-    }, [setOpen]);
+    useEffect(() => {
+      const today = moment().startOf('day');
+      const nextWeek = today.clone().add(6, 'days'); 
   
-    const onConfirmSingle = React.useCallback(
-      (params:any) => {
-        setOpen(false);
-        setDate(params.date);
-      },
-      [setOpen, setDate]
-    );
-
-    const [dateOfAppointment, setDateOfAppointment] =
-    useState<IAppointment | null>(null);
-
-    useEffect(()=>{
-      fetchAvailableDates();
-    },[dateOfAppointment])
+      const dates: IAvailableDates[] = [];
+      while (today.isSameOrBefore(nextWeek)) {
+        dates.push({
+          date: today.format('YYYY-MM-DD'),
+          slotTimes: generateTimeSlots('08:00', '16:45', 45), 
+        });
+        today.add(1, 'day');
+      }
+      setAvailableDates(dates);
+    }, []); 
+  
+    const handleDateChange = useCallback((date: string) => {
+      setSelectedDate(date);
+    }, [])
+  
+    const setDateOfAppointment = useCallback((appointment: IAppointment | null) => {
+      if (appointment) {
+        handleDateChange(appointment.appointmentDate); // Trigger your custom handler
+      }
+    }, [handleDateChange]);
 
     if(!tempProfessional){
       return (<View>
@@ -171,33 +131,18 @@ export default function Booking(){
 
         <ScrollView style={style.container}>
             <ProfessionalCard2 {...tempProfessional}/>
-            {/*
-                    <Button onPress={() => setOpen(true)} uppercase={false} mode="outlined">
-                                    {date ? (date as Date).toDateString() : "Pick a date"} 
-                    </Button>
-                <DatePickerModal
-                     locale="en"
-                mode="single"
-                visible={open}
-                onDismiss={onDismissSingle}
-                date={date}
-                onConfirm={onConfirmSingle}
-                
-                />
-              */}
               <View style={style.timeSlotContainer}>
-            <TimeSlotPicker 
-              availableDates={availableDates}
-              setDateOfAppointment={setDateOfAppointment}
-              timeSlotsTitle="Choose Your Appointment Time"
-              
-            />
+              <TimeSlotPicker
+                availableDates={availableDates}
+                setDateOfAppointment={setDateOfAppointment}
+                timeSlotsTitle="Select a time slot"
+              />
             </View>
             <ContinueButton title="Continue" onPress={()=>{router.push({
               pathname:"/bookingDetails",
               params:{
                 professional: JSON.stringify(tempProfessional),
-                dateOfAppointment:  JSON.stringify(dateOfAppointment)
+              //  dateOfAppointment:  JSON.stringify(dateOfAppointment)
               },
               
             })}}/>
