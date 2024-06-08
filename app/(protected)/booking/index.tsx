@@ -36,9 +36,22 @@ function generateTimeSlots(startTime: string, endTime: string, slotDurationMinut
   return slots;
 }
 
+function parseTime(time:string){
+  const [start, end] = time.split(" - ");
+
+  // Extract hours (assuming 24-hour format)
+  const startHour = parseInt(start.split(":")[0], 10);
+  const endHour = parseInt(end.split(":")[0], 10);
+
+  return {
+    start: startHour,
+    end: endHour,
+  };
+}
 
 export default function Booking(){
 
+  const {accessToken} = useAuth()
   const [tempProfessional, setTempProfessional] = React.useState<Professional>();
   const fetchProfessional = useLocalSearchParams();
   useEffect(()=>{
@@ -121,7 +134,70 @@ export default function Booking(){
            }
         }
       }
-      setAvailableDates(dates);
+      const filteredAppointmentDate:IAvailableDates[] = [];
+      (async()=>{
+          try{
+            const res = await axios({
+              method:"POST",
+              url:`${BACKEND_URL}/api/consultation/takeAllConsultation`,
+              headers:{
+                Authorization: `Bearer ${accessToken}` ,
+              },
+              data:{
+                professional_id: tempProfessional?.professional_id, 
+              }
+            })
+
+            const {data} = res.data;
+
+            console.log("RES",data)
+            console.log("DATES",dates[0])
+
+            // filter
+
+            
+            for(let i = 0;i < dates.length;i++){
+                filteredAppointmentDate.push({
+                  date:dates[i].date,
+                  slotTimes:[],
+                })
+                
+                for(let j = 0; j < dates[i].slotTimes.length;j++){
+                  let exist = false;
+                  
+                  for(let k = 0;k <data.length;k++){
+                      const date1 = new Date(data[k].start_time);
+                      const date2 = new Date(dates[i].date)
+
+                      const startOfDay1 = new Date(date1.getFullYear(), date1.getMonth(), date1.getDate());
+const startOfDay2 = new Date(date2.getFullYear(), date2.getMonth(), date2.getDate());
+
+                      if(startOfDay1.getTime() == startOfDay2.getTime()){
+                        // check for the hour
+                        const {start,end} = parseTime(dates[i].slotTimes[j]);
+
+                        if(start == date1.getUTCHours()){
+                            exist = true;
+                        }
+                      }
+
+                  }
+                    if(exist === false){
+                      filteredAppointmentDate[i].slotTimes.push(dates[i].slotTimes[j])
+                    }
+                }
+
+            }
+            setAvailableDates(filteredAppointmentDate);
+
+          }catch(err){
+            console.log(err)
+          }
+          
+
+      })()
+
+
     }, []); 
   
 

@@ -96,6 +96,7 @@ export default function bookingDetails(){
 
     const createBooking = async() =>{
         try{
+            console.log("POST",slotAppointment)
             const res = await axios({
                 method: "POST",
                 url: `${BACKEND_URL}/api/booking/createBooking`,
