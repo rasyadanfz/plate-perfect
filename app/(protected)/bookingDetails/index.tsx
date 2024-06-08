@@ -5,14 +5,15 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { StyleSheet } from "react-native";
 import { useAuth } from "../../context/AuthProvider";
 import { Professional } from "../../../types/dbTypes";
-import { useLocalSearchParams } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { useEffect } from "react";
 import ProfessionalCard2 from "../../globals/components/ProfessionalCard2";
 import { useState } from "react";
 import { PaymentMethod } from "../../globals/components/PaymentMethod";
 import ContinueButton from "../../globals/components/ContinueButton";
 import { IAppointment } from "@dgreasi/react-native-time-slot-picker";
-
+import axios from "axios";
+import { BACKEND_URL } from "@env";
 
 
 export default function bookingDetails(){
@@ -30,13 +31,12 @@ export default function bookingDetails(){
       }
       
       const {dateOfAppointment} = fetchProfessional
-      let deserializedDateOfAppointment = dateOfAppointment
+      let deserializedDateOfAppointment;
 
-      if(deserializedDateOfAppointment){
+      if(dateOfAppointment){
          deserializedDateOfAppointment = JSON.parse(dateOfAppointment as string);
+        setSlotAppointment(deserializedDateOfAppointment)
       }
-
-
     },[])
 
 
@@ -90,11 +90,68 @@ export default function bookingDetails(){
         }
     });
 
-    const {user, role} = useAuth();
+    const {user, role, accessToken} = useAuth();
 
     const [checked, setChecked] = useState("CASH")
 
-    
+    const createBooking = async() =>{
+        try{
+            const res = await axios({
+                method: "POST",
+                url: `${BACKEND_URL}/api/booking/createBooking`,
+                headers:{
+                    Authorization : `Bearer ${accessToken}`,
+                },
+                data:{
+                    professional_id: tempProfessional?.professional_id,
+                    dateOfAppointment: slotAppointment
+                }
+            })   
+            
+            
+            if(res.data.success){
+                // create the payment
+                console.log("Booking created")
+
+                const res2 = await axios({
+                    method:"POST",
+                    url: `${BACKEND_URL}/api/payment/createPayment`,
+                    headers:{
+                        Authorization: `Bearer ${accessToken}`,
+                    },
+                    data:{
+                        booking_id:res.data.query.booking_id,
+                        method:checked,
+                        amount: (tempProfessional?.experience == undefined ? 1 : tempProfessional?.experience)*10000 + 3000
+                    }
+                })
+
+                if(res2.data.success){
+                    console.log("Payment created")
+                }else{
+                    console.log("Payment failed ")
+                }
+            }else{
+                console.log("Booking failed")   
+            }
+            
+
+        }catch(err){
+            console.log(err)
+        }
+
+
+    }
+
+    const handleOnPress = async() =>{
+        try{
+            await createBooking();
+            router.navigate("home")
+        }catch(err){
+            console.log(err)
+        }
+    }
+
     
     if(!tempProfessional){
         return (<View>
@@ -151,7 +208,8 @@ export default function bookingDetails(){
                     </Text>
                     <PaymentMethod setState={setChecked} state={checked}/>
                 </View>
-                <ContinueButton title="Pay & Confirm" onPress={()=>{}} /> 
+                <ContinueButton title="Pay & Confirm" onPress={handleOnPress}
+                /> 
                 
             </View>
         </View>

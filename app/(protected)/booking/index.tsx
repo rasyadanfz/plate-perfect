@@ -95,6 +95,8 @@ export default function Booking(){
     const [availableDates, setAvailableDates] = useState<IAvailableDates[]>([]);
     const [selectedDate, setSelectedDate] = useState<string | null>(null);
     const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
+    const [dateOfAppointment,setDateOfAppointment] = useState<IAppointment |null>( null);
+
   
     useEffect(() => {
       const today = moment().startOf('day');
@@ -107,13 +109,23 @@ export default function Booking(){
           slotTimes: generateTimeSlots('08:00', '16:45', 45), 
         });
         today.add(1, 'day');
+        
+        for(let i = 0;i < dates.length; i++){
+           if(dates[i].slotTimes.length != 0){
+              const newAppointmenDate:IAppointment = {
+                appointmentDate:dates[i].date,
+                appointmentTime:dates[i].slotTimes[0]
+              }
+              setDateOfAppointment(newAppointmenDate);
+              break;
+           }
+        }
       }
       setAvailableDates(dates);
     }, []); 
   
 
 
-    const [dateOfAppointment,setDateOfAppointment] = useState<IAppointment |null>( null);
 
 
 
