@@ -48,20 +48,16 @@ export type Professional = {
     phone_num?: string;
     balance: number;
     experience: number;
-    consultations: Consultation[];
-    chat_messages: ChatMessage[];
-    summary: Summary[];
     hasCompletedData: boolean;
+    currentChatRoom: string | null;
 };
 
 export type Booking = {
     booking_id: string;
     booking_time: Date;
-    status: BookingStatus;
-    customer: User;
+    status: string;
     customer_id: string;
-    payment?: Payment;
-    consultation?: Consultation;
+    type: string;
 };
 
 export type Payment = {
@@ -77,17 +73,12 @@ export type Payment = {
 
 export type Consultation = {
     consultation_id: string;
-    booking: Booking;
     booking_id: string;
     date: Date;
     start_time: Date;
     end_time: Date;
-    customer: User;
     customer_id: string;
-    professional: Professional;
     professional_id: string;
-    summary?: Summary;
-    chat?: Chat;
 };
 
 export type Summary = {

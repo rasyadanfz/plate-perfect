@@ -29,7 +29,7 @@ export default function ProtectedLayout() {
                     flex: 1,
                     justifyContent: "center",
                     alignItems: "center",
-                    backgroundColor: "#eda80c",
+                    backgroundColor: "#e8efcf",
                 }}
             >
                 <Text style={{ fontSize: 20 }}>Loading...</Text>

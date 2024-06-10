@@ -29,6 +29,22 @@ export default function StackLayout() {
                     headerTintColor: "white",
                 }}
             />
+            <Stack.Screen
+                name="consultationHist"
+                options={{
+                    headerTitle: "Consultation History",
+                    headerStyle: { backgroundColor: "#404c4c" },
+                    headerTintColor: "white",
+                }}
+            />
+            <Stack.Screen
+                name="professionalList"
+                options={{
+                    headerTitle: "Consultation History",
+                    headerStyle: { backgroundColor: "#404c4c" },
+                    headerTintColor: "white",
+                }}
+            />
         </Stack>
     );
 }

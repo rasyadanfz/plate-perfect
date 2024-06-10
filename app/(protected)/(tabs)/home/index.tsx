@@ -7,38 +7,56 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import ProfessionalCard from "../../../globals/components/ProfessionalCard";
 import HistoryCard from "../../../globals/components/HistoryCard";
 import NextSchedule from "../../../globals/components/NextSchedule";
-import { Professional, ProfessionalRole, User } from "../../../../types/dbTypes";
+import { Booking, Professional, ProfessionalRole, User } from "../../../../types/dbTypes";
 import React from "react";
 import axios from "axios";
 import { BACKEND_URL } from "@env";
 import { useEffect } from "react";
 
-
-
 export default function Home() {
     const { user, role, accessToken } = useAuth();
     const safeInsets = useSafeAreaInsets();
-    
-    const [tempProfessional, setTempProfessional] = React.useState<Professional | null>(null);  
+
+    const [tempProfessional, setTempProfessional] = React.useState<Professional | null>(null);
+    const [userHistory, setUserHistory] = React.useState<Booking[]>([]);
+    const [isLoading, setIsLoading] = React.useState(true);
 
     useEffect(() => {
         const fetchProfessional = async () => {
             try {
                 const response = await axios({
-                    method:'GET',
-                    headers:{
-                        Authorization:`Bearer ${accessToken}`
+                    method: "GET",
+                    headers: {
+                        Authorization: `Bearer ${accessToken}`,
                     },
-                    url:`${BACKEND_URL}/api/professional/getOneProfessional`,
+                    url: `${BACKEND_URL}/api/professional/getOneProfessional`,
                 });
                 setTempProfessional(response.data.data);
             } catch (error) {
+                console.log("getOne");
+                console.log(error);
+            }
+        };
+
+        const fetchUserHistory = async () => {
+            try {
+                const response = await axios({
+                    method: "GET",
+                    headers: {
+                        Authorization: `Bearer ${accessToken}`,
+                    },
+                    url: `${BACKEND_URL}/api/booking/oneUserHistory`,
+                });
+                setUserHistory(response.data.data);
+            } catch (error) {
+                console.log("oneHist");
                 console.log(error);
             }
         };
         fetchProfessional();
+        fetchUserHistory();
+        setIsLoading(false);
     }, []);
-
 
     const style = StyleSheet.create({
         container: {
@@ -74,8 +92,15 @@ export default function Home() {
             fontWeight: "bold",
             marginBottom: 5,
         },
-        button: {},
     });
+
+    if (isLoading) {
+        return (
+            <View style={style.container}>
+                <Text style={{ fontSize: 18 }}>Please wait...</Text>
+            </View>
+        );
+    }
 
     if (role === "USER") {
         const userData = user as User;
@@ -91,6 +116,7 @@ export default function Home() {
                             mode="contained"
                             style={{ backgroundColor: "#ecca9c" }}
                             labelStyle={{ fontSize: 10, lineHeight: 10, color: "black" }}
+                            onPress={() => router.push("/home/professionalList")}
                         >
                             See All
                         </Button>
@@ -98,7 +124,7 @@ export default function Home() {
                     <Text style={style.sectionItem}>
                         Here are our professional recommendation for you!
                     </Text>
-                    <ProfessionalCard {...tempProfessional as Professional } />
+                    <ProfessionalCard {...(tempProfessional as Professional)} />
                 </View>
                 <View style={style.sectionContainer}>
                     <View style={style.section}>
@@ -107,20 +133,29 @@ export default function Home() {
                             mode="contained"
                             style={{ backgroundColor: "#ecca9c" }}
                             labelStyle={{ fontSize: 10, lineHeight: 10, color: "black" }}
+                            onPress={() => router.push("/home/consultationHist")}
                         >
                             See All
                         </Button>
                     </View>
                     <Text style={style.sectionItem}>Your last consultation history</Text>
-                    <HistoryCard role="USER" />
+                    {userHistory.length > 0 ? (
+                        <HistoryCard
+                            role="USER"
+                            type={userHistory[0].type}
+                            booking_id={userHistory[0].booking_id}
+                        />
+                    ) : (
+                        <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+                            <Text style={{ fontSize: 13, marginTop: 10, fontWeight: "bold" }}>
+                                You have no consultation history
+                            </Text>
+                        </View>
+                    )}
                 </View>
                 <View style={style.sectionContainer}>
                     <Text style={style.subtitle}>Next Schedule</Text>
-                    <NextSchedule
-                        role="USER"
-                        title="Konsultasi Masakan"
-                        clientOrProfessionalName="Dr. H. Ben Edict"
-                    />
+                    <NextSchedule role="USER" />
                 </View>
                 <Button mode="contained" onPress={() => router.push("/chat/1")}>
                     Chat
@@ -146,15 +181,11 @@ export default function Home() {
                         </Button>
                     </View>
                     <Text style={style.sectionItem}>Your last consultation history</Text>
-                    <HistoryCard role="PROFESSIONAL" />
+                    {/* <HistoryCard role="PROFESSIONAL" /> */}
                 </View>
                 <View style={style.sectionContainer}>
                     <Text style={style.subtitle}>Next Schedule</Text>
-                    <NextSchedule
-                        role="PROFESSIONAL"
-                        title="Konsultasi Masakan"
-                        clientOrProfessionalName="Hugo Benedicto"
-                    />
+                    <NextSchedule role="PROFESSIONAL" />
                 </View>
                 <Button mode="contained" onPress={() => router.push("/chat/1")}>
                     Chat
