@@ -93,12 +93,15 @@ export default function HistoryCard({
                     }else{
                         console.log("THERE IS NO PROF DATA")
                     }
-                
+                    
                 } catch (error) {
                     console.log("getProfId");
                     console.log(error);
                 }finally{
                     setIsLoading(false)
+                    if(trig < 1){
+                        setTrig(trig+1)
+                    }
                 }
             }
 
@@ -106,7 +109,7 @@ export default function HistoryCard({
         },[trig]);
 
 
-        if(isLoading === false){
+        if(isLoading === false && consultationData && profData ){
 
             const date = new Date(consultationData.date);
             
@@ -115,7 +118,7 @@ export default function HistoryCard({
                     <View style={style.desc}>
                         <View style={style.title}>
                             <Text style={{ fontSize: 14 }}>Konsultasi {type}</Text>
-                            <Text style={{ fontSize: 11 }}>{profData!.name}</Text>
+                            <Text style={{ fontSize: 11 }}>{profData.name}</Text>
                         </View>
                         <View>
                             <Text style={{ fontSize: 13 }}>{date.toDateString()}</Text>
