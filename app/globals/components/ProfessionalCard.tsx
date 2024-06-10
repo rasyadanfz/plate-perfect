@@ -1,5 +1,8 @@
 import { Image, StyleSheet, View } from "react-native";
 import { Button, Text } from "react-native-paper";
+import React from "react";
+import { Redirect, router } from "expo-router";
+import { Professional } from "../../../types/dbTypes";
 
 const style = StyleSheet.create({
     container: {
@@ -38,7 +41,7 @@ const style = StyleSheet.create({
 interface ProfessionalProps {
     name: string;
 }
-export default function ProfessionalCard(props: ProfessionalProps) {
+export default function ProfessionalCard(props: Professional) {
     const { name } = props;
     return (
         <View style={style.container}>
@@ -55,6 +58,15 @@ export default function ProfessionalCard(props: ProfessionalProps) {
                         mode="contained"
                         style={style.button}
                         labelStyle={{ fontSize: 10, lineHeight: 10, color: "black" }}
+                        onPress={()=>{
+                            //router.push("/booking");
+                            router.push({
+                                pathname:"/booking",
+                                params:{
+                                    professional: JSON.stringify(props)
+                                }
+                            })
+                        }}
                     >
                         Book &gt;
                     </Button>

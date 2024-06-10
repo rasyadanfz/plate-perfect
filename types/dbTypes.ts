@@ -1,4 +1,4 @@
-enum ProfessionalRole {
+export enum ProfessionalRole {
     NUTRISIONIST = "NUTRISIONIST",
     CHEF = "CHEF",
 }

@@ -1,6 +1,6 @@
 import { Tabs } from "expo-router";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
-import { useAuth } from "../../context/AuthProvider";
+import { useAuth } from "../../context/A    uthProvider";
 
 export default function TabLayout() {
     return (

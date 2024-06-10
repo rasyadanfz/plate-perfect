@@ -7,11 +7,38 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import ProfessionalCard from "../../../globals/components/ProfessionalCard";
 import HistoryCard from "../../../globals/components/HistoryCard";
 import NextSchedule from "../../../globals/components/NextSchedule";
-import { Professional, User } from "../../../../types/dbTypes";
+import { Professional, ProfessionalRole, User } from "../../../../types/dbTypes";
+import React from "react";
+import axios from "axios";
+import { BACKEND_URL } from "@env";
+import { useEffect } from "react";
+
+
 
 export default function Home() {
-    const { user, role } = useAuth();
+    const { user, role, accessToken } = useAuth();
     const safeInsets = useSafeAreaInsets();
+    
+    const [tempProfessional, setTempProfessional] = React.useState<Professional | null>(null);  
+
+    useEffect(() => {
+        const fetchProfessional = async () => {
+            try {
+                const response = await axios({
+                    method:'GET',
+                    headers:{
+                        Authorization:`Bearer ${accessToken}`
+                    },
+                    url:`${BACKEND_URL}/api/professional/getOneProfessional`,
+                });
+                setTempProfessional(response.data.data);
+            } catch (error) {
+                console.log(error);
+            }
+        };
+        fetchProfessional();
+    }, []);
+
 
     const style = StyleSheet.create({
         container: {
@@ -71,7 +98,7 @@ export default function Home() {
                     <Text style={style.sectionItem}>
                         Here are our professional recommendation for you!
                     </Text>
-                    <ProfessionalCard name="H. Ben Edict" />
+                    <ProfessionalCard {...tempProfessional as Professional } />
                 </View>
                 <View style={style.sectionContainer}>
                     <View style={style.section}>
