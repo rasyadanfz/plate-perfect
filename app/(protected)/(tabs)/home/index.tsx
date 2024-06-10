@@ -129,7 +129,8 @@ export default function Home() {
                 <View style={style.sectionContainer}>
                     <View style={style.section}>
                         <Text style={style.subtitle}>Consultation History</Text>
-                        <Button
+                        {
+                            userHistory.length > 0 &&                         <Button
                             mode="contained"
                             style={{ backgroundColor: "#ecca9c" }}
                             labelStyle={{ fontSize: 10, lineHeight: 10, color: "black" }}
@@ -137,6 +138,8 @@ export default function Home() {
                         >
                             See All
                         </Button>
+                        }
+
                     </View>
                     <Text style={style.sectionItem}>Your last consultation history</Text>
                     {userHistory.length > 0 ? (
