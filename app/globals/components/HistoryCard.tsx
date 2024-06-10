@@ -51,27 +51,12 @@ export default function HistoryCard({
         const [profData, setProfData] = useState<Professional>();
         const [consultationData, setConsultationData] = useState<Consultation>();
         const [isLoading, setIsLoading] = useState(true);
+        const [trig,setTrig] = useState(0)
         useEffect(() => {
-            const getProfData = async () => {
-                if (!consultationData?.professional_id) return;
-                try {
-                    const response = await axios({
-                        method: "GET",
-                        headers: {
-                            Authorization: `Bearer ${accessToken}`,
-                        },
-                        url: `${BACKEND_URL}/api/professional/getProfId/${consultationData?.professional_id}`,
-                    });
 
-                    if(response){
-                        setProfData(response.data.data)
-                    }
-                } catch (error) {
-                    console.log("getProfId");
-                    console.log(error);
-                }
-            };
-            const getConsultationData = async () => {
+
+            const allinOneFunction = async()=>{
+                setIsLoading(true)
                 try {
                     const response = await axios({
                         method: "GET",
@@ -83,23 +68,48 @@ export default function HistoryCard({
 
                     if(response.data.data){
                         setConsultationData(response.data.data)
+                    }else{
+                        console.log("THERE IS NO CONSULTATION DATA")
+                        return;
                     }
                     
-
                 } catch (error) {
                     console.log("GetConsultationWithBookingID");
                     console.log(error);
                 }
-            };
-            getConsultationData()
-            getProfData();
-           setIsLoading(false);
-        },[]);
 
-        if(profData !== undefined && consultationData !== undefined){
+                try {
+                    setIsLoading(true)
+                    const response = await axios({
+                        method: "GET",
+                        headers: {
+                            Authorization: `Bearer ${accessToken}`,
+                        },
+                        url: `${BACKEND_URL}/api/professional/getProfId/${consultationData?.professional_id}`,
+                    });
+
+                    if(response){
+                        setProfData(response.data.data)
+                    }else{
+                        console.log("THERE IS NO PROF DATA")
+                    }
+                
+                } catch (error) {
+                    console.log("getProfId");
+                    console.log(error);
+                }finally{
+                    setIsLoading(false)
+                }
+            }
+
+            allinOneFunction()
+        },[trig]);
+
+
+        if(isLoading === false){
 
             const date = new Date(consultationData.date);
-    
+            
             return (
                 <View style={style.container}>
                     <View style={style.desc}>
@@ -130,6 +140,7 @@ export default function HistoryCard({
                 </View>
             );
         }else{
+        
             return (
                 <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
                     <Text style={{ fontSize: 18 }}>Please wait...</Text>
