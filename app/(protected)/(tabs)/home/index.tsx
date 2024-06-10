@@ -95,8 +95,8 @@ export default function Home() {
                         clientOrProfessionalName="Dr. H. Ben Edict"
                     />
                 </View>
-                <Button mode="contained" onPress={() => router.push("/summary")}>
-                    Summary
+                <Button mode="contained" onPress={() => router.push("/chat/1")}>
+                    Chat
                 </Button>
             </ScrollView>
         );
@@ -129,8 +129,8 @@ export default function Home() {
                         clientOrProfessionalName="Hugo Benedicto"
                     />
                 </View>
-                <Button mode="contained" onPress={() => router.push("/summary")}>
-                    Summary
+                <Button mode="contained" onPress={() => router.push("/chat/1")}>
+                    Chat
                 </Button>
             </ScrollView>
         );

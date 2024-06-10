@@ -1,13 +1,20 @@
 import { useEffect, useRef, useState } from "react";
-import { GestureResponderEvent, StyleSheet, Text, View } from "react-native";
+import { Alert, GestureResponderEvent, StyleSheet, Text, View } from "react-native";
 import { Button, TextInput } from "react-native-paper";
 import { EdgeInsets, useSafeAreaInsets } from "react-native-safe-area-context";
 import { createId } from "@paralleldrive/cuid2";
 import { socket } from "../../../helpers/ioSocketHelper";
 import ChatBubble from "../../globals/components/ChatBubble";
 import { Message } from "../../../types/chat.type";
+import { useAuth } from "../../context/AuthProvider";
+import { Professional, User } from "../../../types/dbTypes";
+import { useLocalSearchParams } from "expo-router";
+import axios from "axios";
+import { BACKEND_URL } from "@env";
 
 export default function ChatRoom() {
+    const { roomId } = useLocalSearchParams<{ roomId: string }>();
+    const { user, role, accessToken } = useAuth();
     const [messages, setMessages] = useState<Message[]>([]);
     const [messageToSend, setMessageToSend] = useState<string>("");
     const [activity, setActivity] = useState("");
@@ -16,14 +23,30 @@ export default function ChatRoom() {
     const insets = useSafeAreaInsets();
     const styles = chatRoomStyles(insets);
     useEffect(() => {
+        const { user, role } = useAuth();
+        const fetchMessages = async () => {
+            const response = await axios({
+                method: "GET",
+                url: `${BACKEND_URL}/api/chatRoom/${roomId}`,
+                headers: {
+                    Authorization: `Bearer ${accessToken}`,
+                },
+            });
+            setMessages(response.data.messages);
+        };
         function onConnect() {
             setIsSocketConnected(true);
+            socket.emit("enterRoom", {
+                userId:
+                    role === "USER" ? (user as User).user_id : (user as Professional).professional_id,
+                name: user!.name,
+                roomId: roomId,
+                role: role,
+            });
         }
 
         function onMessage(msg: Message) {
-            console.log("Messages: ", [...messages]);
             const newMessageArr = [...messages, msg];
-            console.log("New Messages: ", newMessageArr);
             setMessages(newMessageArr);
         }
 
@@ -50,18 +73,37 @@ export default function ChatRoom() {
 
     function editMessageToSend(msg: string) {
         setMessageToSend(msg);
-        socket.emit("activity", socket.id);
+        socket.emit("activity", user?.name);
     }
 
-    function sendMessage(e: GestureResponderEvent) {
+    async function sendMessage(e: GestureResponderEvent) {
         e.preventDefault();
         if (messageToSend) {
+            const createBackendMsg = await axios({
+                method: "POST",
+                url: `${BACKEND_URL}/api/chatMsg/${roomId}`,
+                data: { content: messageToSend },
+                headers: { Authorization: `Bearer ${accessToken}` },
+            });
+
             const newMsg = {
-                id: createId(),
-                message: messageToSend,
+                sender_id:
+                    role === "USER" ? (user as User).user_id : (user as Professional).professional_id,
+                sender_name: user?.name,
+                text: messageToSend,
+                created_at: new Intl.DateTimeFormat("default", {
+                    hour: "numeric",
+                    minute: "numeric",
+                    second: "numeric",
+                }).format(new Date()),
             };
-            socket.emit("message", newMsg);
-            setMessageToSend("");
+
+            if (createBackendMsg.status === 200) {
+                socket.emit("message", newMsg);
+                setMessageToSend("");
+            } else {
+                Alert.alert("Error", "Failed sending message");
+            }
         }
     }
 
@@ -71,7 +113,12 @@ export default function ChatRoom() {
                 <Text>Status: {isSocketConnected ? "connected" : "Disconnected"}</Text>
                 <Text>Chat Room</Text>
                 {messages.map((msg) => (
-                    <ChatBubble key={msg.id} message={msg.message} id={msg.id} isSelf={true} />
+                    <ChatBubble
+                        key={msg.message_id}
+                        message={msg.content}
+                        id={msg.message_id}
+                        isSelf={true}
+                    />
                 ))}
                 {activity && <Text key="activity">{activity}</Text>}
             </View>

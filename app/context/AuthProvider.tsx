@@ -83,6 +83,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                 checkTokenExpiration(accessToken);
                 return true;
             } else {
+                console.log("Failed Login");
                 return false;
             }
         } catch (error) {
