@@ -48,7 +48,8 @@ const consultationHist = () => {
         fetchBooking();
     },[])
     
-
+    const {role} = useAuth();
+    // need role, type, and booking_id
     return (
         <View style={style.allContainer}>
             <FlatList 
@@ -57,9 +58,11 @@ const consultationHist = () => {
                 renderItem={
                     ({item}) => (
                         <View style={style.listItemContainer}>
-                            
-                            
-
+                            <HistoryCard 
+                                role={role}
+                                type={item.type}
+                                booking_id={item.booking_id}
+                            />
                         </View>
                     )
                 }
