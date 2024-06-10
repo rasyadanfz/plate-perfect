@@ -138,10 +138,6 @@ export default function Booking() {
                 });
 
                 const { data } = res.data;
-
-                console.log("RES", data);
-                console.log("DATES", dates[0]);
-
                 // filter
 
                 for (let i = 0; i < dates.length; i++) {

@@ -52,7 +52,7 @@ export default function ProfessionalCard(props: Professional) {
                 <View style={style.desc}>
                     <View>
                         <Text>{name}</Text>
-                        <Text style={{ fontSize: 10 }}>Chef de Cuisine</Text>
+                        <Text style={{ fontSize: 10 }}>{props.role}</Text>
                     </View>
                     <Button
                         mode="contained"
