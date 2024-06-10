@@ -44,13 +44,13 @@ export default function SignInPage() {
     });
 
     const bypassSignIn1 = async () => {
-        const user = await signIn("user123@gmail.com", "user1234", false);
+        const user = await signIn("faza1234@gmail.com", "faza1234", false);
         if (user) {
             router.replace("/home");
         }
     };
     const bypassSignIn2 = async () => {
-        const user = await signIn("prof@p.com", "prof1234", false);
+        const user = await signIn("professionalDev@gmail.com", "professional1234", false);
         if (user) {
             router.replace("/home");
         }

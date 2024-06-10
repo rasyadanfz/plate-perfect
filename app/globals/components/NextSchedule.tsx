@@ -5,7 +5,7 @@ import { Text, Button } from "react-native-paper";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import { useAuth } from "../../context/AuthProvider";
 import { useEffect, useState } from "react";
-import { Booking, Consultation, Professional } from "../../../types/dbTypes";
+import { Booking, Consultation, Professional, User } from "../../../types/dbTypes";
 
 const style = StyleSheet.create({
     container: {
@@ -77,6 +77,7 @@ export default function NextSchedule({ role }: { role: string }) {
                     });
                     setBookingData(response.data.data);
                     tempBooking = response.data.data;
+                    console.log(tempBooking);
                     return tempBooking;
                 } catch (error) {
                     console.log("HERE1");
@@ -137,7 +138,7 @@ export default function NextSchedule({ role }: { role: string }) {
         } else if (!consultationData) {
             return (
                 <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-                    <Text style={{ fontSize: 13, marginTop: 10, fontWeight: "bold" }}>
+                    <Text style={{ fontSize: 13, marginTop: 20, fontWeight: "bold" }}>
                         You have no consultation scheduled
                     </Text>
                 </View>
@@ -156,30 +157,128 @@ export default function NextSchedule({ role }: { role: string }) {
                     </View>
                     <View style={style.detailContainer}>
                         <DetailCard text="45 Minute" />
-                        <Text style={{ fontSize: 15, fontWeight: "bold" }}>
-                            {new Date(consultationData?.date).toLocaleTimeString("en-GB")}
+                        <Text style={{ fontSize: 12, fontWeight: "bold" }}>
+                            {new Date(consultationData?.date).toDateString() +
+                                " " +
+                                new Date(consultationData?.date).toLocaleTimeString()}
                         </Text>
                     </View>
                 </View>
             );
         }
     } else {
-        return (
-            <View style={style.container}>
-                <View style={style.desc}>
-                    <View style={style.title}>
-                        <Text style={{ fontSize: 14 }}>{title}</Text>
-                        <Text style={{ fontSize: 11 }}>Client: {clientOrProfessionalName}</Text>
+        const [consultationData, setConsultationData] = useState<Consultation>();
+        const [booking, setBooking] = useState<Booking>();
+        const [customerData, setCustomerData] = useState<User>();
+        const [isLoading, setIsLoading] = useState(true);
+
+        useEffect(() => {
+            // Get the next schedule
+            const getConsultationData = async () => {
+                try {
+                    const response = await axios({
+                        method: "GET",
+                        headers: {
+                            Authorization: `Bearer ${accessToken}`,
+                        },
+                        url: `${BACKEND_URL}/api/consultation/professionalNextSchedule`,
+                    });
+                    const data: Consultation[] = response.data.data;
+                    setConsultationData(data[0]);
+                    return data;
+                } catch (error) {
+                    console.log("getConsultationData");
+                    console.log(error);
+                }
+            };
+
+            const getUserData = async (userId: string) => {
+                try {
+                    const response = await axios({
+                        method: "GET",
+                        headers: {
+                            Authorization: `Bearer ${accessToken}`,
+                        },
+                        url: `${BACKEND_URL}/api/profile/user/${userId}`,
+                    });
+                    setCustomerData(response.data.data);
+                } catch (error) {
+                    console.log("getUserData");
+                    console.log(error);
+                }
+            };
+
+            const getBooking = async (bookId: string) => {
+                try {
+                    const response = await axios({
+                        method: "GET",
+                        headers: {
+                            Authorization: `Bearer ${accessToken}`,
+                        },
+                        url: `${BACKEND_URL}/api/booking/${bookId}`,
+                    });
+                    setBooking(response.data.data);
+                } catch (error) {
+                    console.log("getBooking");
+                    console.log(error);
+                }
+            };
+
+            const getData = async () => {
+                const consultData = await getConsultationData();
+                if (!consultData || !consultData.length) return;
+                console.log("TEST10");
+                await getBooking(consultData[0].booking_id);
+                console.log("TEST2");
+                await getUserData(consultData[0].customer_id);
+                console.log("TEST3");
+            };
+
+            getData();
+            setIsLoading(false);
+        }, []);
+        if (isLoading) {
+            return (
+                <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+                    <Text style={{ fontSize: 18 }}>Please wait...</Text>
+                </View>
+            );
+        }
+
+        if (consultationData && booking && customerData) {
+            return (
+                <View style={style.container}>
+                    <View style={style.desc}>
+                        <View style={style.title}>
+                            <Text style={{ fontSize: 14 }}>Konsultasi {booking?.type}</Text>
+                            <Text style={{ fontSize: 11 }}>Client: {customerData?.name}</Text>
+                        </View>
+                        <View>
+                            <ConsultButton />
+                        </View>
                     </View>
-                    <View>
-                        <ConsultButton />
+                    <View style={style.detailContainer}>
+                        {consultationData && (
+                            <>
+                                <DetailCard text="45 Minute" />
+                                <Text style={{ fontSize: 12, fontWeight: "bold" }}>
+                                    {new Date(consultationData.start_time).toDateString() +
+                                        " " +
+                                        new Date(consultationData?.start_time).toLocaleTimeString()}
+                                </Text>
+                            </>
+                        )}
                     </View>
                 </View>
-                <View style={style.detailContainer}>
-                    <DetailCard text="45 Minute" />
-                    <Text style={{ fontSize: 15, fontWeight: "bold" }}>13:00</Text>
+            );
+        } else {
+            return (
+                <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+                    <Text style={{ fontSize: 13, marginTop: 10, fontWeight: "bold" }}>
+                        You have no schedule
+                    </Text>
                 </View>
-            </View>
-        );
+            );
+        }
     }
 }

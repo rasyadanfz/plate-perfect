@@ -1,6 +1,6 @@
 import { StyleSheet, View } from "react-native";
 import { Button, Text } from "react-native-paper";
-import { Consultation, Professional } from "../../../types/dbTypes";
+import { Consultation, Professional, User } from "../../../types/dbTypes";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useAuth } from "../../context/AuthProvider";
@@ -41,10 +41,14 @@ export default function HistoryCard({
     role,
     type,
     booking_id,
+    user_id,
+    consultation,
 }: {
     role: string;
     type: string;
-    booking_id: string;
+    booking_id?: string;
+    user_id?: string;
+    consultation?: Consultation;
 }) {
     if (role.toLowerCase() === "user") {
         const { accessToken } = useAuth();
@@ -97,7 +101,7 @@ export default function HistoryCard({
         } else if (!consultationData) {
             return (
                 <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-                    <Text style={{ fontSize: 18 }}>You have no consultation history</Text>
+                    <Text style={{ fontSize: 18, marginTop: 20 }}>You have no consultation history</Text>
                 </View>
             );
         } else {
@@ -132,34 +136,70 @@ export default function HistoryCard({
             );
         }
     } else {
-        return (
-            <View style={style.container}>
-                <View style={style.desc}>
-                    <View style={style.title}>
-                        <Text style={{ fontSize: 14 }}>Konsultasi Masakan</Text>
-                        <Text style={{ fontSize: 11 }}>Client: Hugo Benedicto</Text>
+        const [userData, setUserData] = useState<User>();
+        const [isLoading, setIsLoading] = useState(true);
+        const { accessToken } = useAuth();
+        useEffect(() => {
+            console.log(user_id);
+            const getUserData = async () => {
+                try {
+                    const response = await axios({
+                        method: "GET",
+                        headers: {
+                            Authorization: `Bearer ${accessToken}`,
+                        },
+                        url: `${BACKEND_URL}/api/profile/user/${user_id}`,
+                    });
+                    setUserData(response.data.data);
+                    setIsLoading(false);
+                } catch (error) {
+                    console.log("getUserData");
+                    console.log(error);
+                }
+            };
+            getUserData();
+        }, []);
+
+        if (isLoading) {
+            return (
+                <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+                    <Text style={{ fontSize: 18 }}>Please wait...</Text>
+                </View>
+            );
+        } else {
+            return (
+                <View style={style.container}>
+                    <View style={style.desc}>
+                        <View style={style.title}>
+                            <Text style={{ fontSize: 14 }}>Konsultasi {type}</Text>
+                            <Text style={{ fontSize: 11 }}>Client: {userData!.name}</Text>
+                        </View>
+                        <View>
+                            <Text style={{ fontSize: 11 }}>
+                                {new Date(consultation!.start_time).toDateString() +
+                                    " " +
+                                    new Date(consultation!.start_time).toLocaleTimeString()}
+                            </Text>
+                        </View>
                     </View>
-                    <View>
-                        <Text style={{ fontSize: 13 }}>2022-01-01</Text>
+                    <View style={style.buttonContainer}>
+                        <Button
+                            mode="contained"
+                            style={{ flex: 1, backgroundColor: "#ecca9c" }}
+                            labelStyle={style.buttonText}
+                        >
+                            Summary &gt;
+                        </Button>
+                        <Button
+                            mode="contained"
+                            style={{ flex: 1, backgroundColor: "#ecca9c" }}
+                            labelStyle={style.buttonText}
+                        >
+                            Chat History &gt;
+                        </Button>
                     </View>
                 </View>
-                <View style={style.buttonContainer}>
-                    <Button
-                        mode="contained"
-                        style={{ flex: 1, backgroundColor: "#ecca9c" }}
-                        labelStyle={style.buttonText}
-                    >
-                        Summary &gt;
-                    </Button>
-                    <Button
-                        mode="contained"
-                        style={{ flex: 1, backgroundColor: "#ecca9c" }}
-                        labelStyle={style.buttonText}
-                    >
-                        Chat History &gt;
-                    </Button>
-                </View>
-            </View>
-        );
+            );
+        }
     }
 }
