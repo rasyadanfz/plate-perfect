@@ -47,15 +47,23 @@ export default function Home() {
                     },
                     url: `${BACKEND_URL}/api/booking/oneUserHistory`,
                 });
-                setUserHistory(response.data.data);
+
+                const response2 = await axios({
+                    method: "GET",
+                    headers: {
+                        Authorization: `Bearer ${accessToken}`,
+                    },
+                    url: `${BACKEND_URL}/api/booking/userHistory`,
+                })
+                setUserHistory(response2.data.data);
             } catch (error) {
                 console.log("oneHist");
                 console.log(error);
             }
         };
         fetchProfessional();
-        fetchUserHistory();
         setIsLoading(false);
+        fetchUserHistory();
     }, []);
 
     const style = StyleSheet.create({
@@ -143,11 +151,13 @@ export default function Home() {
                     </View>
                     <Text style={style.sectionItem}>Your last consultation history</Text>
                     {userHistory.length > 0 ? (
+                        
                         <HistoryCard
                             role="USER"
                             type={userHistory[0].type}
                             booking_id={userHistory[0].booking_id}
                         />
+                        
                     ) : (
                         <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
                             <Text style={{ fontSize: 13, marginTop: 10, fontWeight: "bold" }}>

@@ -62,7 +62,10 @@ export default function HistoryCard({
                         },
                         url: `${BACKEND_URL}/api/professional/getProfId/${consultationData?.professional_id}`,
                     });
-                    setProfData(response.data.data);
+
+                    if(response){
+                        setProfData(response.data.data)
+                    }
                 } catch (error) {
                     console.log("getProfId");
                     console.log(error);
@@ -77,30 +80,26 @@ export default function HistoryCard({
                         },
                         url: `${BACKEND_URL}/api/consultation/getConsultationWithBookingId/${booking_id}`,
                     });
-                    setConsultationData(response.data.data);
+
+                    if(response.data.data){
+                        setConsultationData(response.data.data)
+                    }
+                    
+
                 } catch (error) {
-                    console.log("getConsultationDataBookID");
+                    console.log("GetConsultationWithBookingID");
                     console.log(error);
                 }
             };
-            getConsultationData();
+            getConsultationData()
             getProfData();
-            setIsLoading(false);
-        });
+           setIsLoading(false);
+        },[]);
 
-        if (isLoading) {
-            return (
-                <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-                    <Text style={{ fontSize: 18 }}>Please wait...</Text>
-                </View>
-            );
-        } else if (!consultationData) {
-            return (
-                <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-                    <Text style={{ fontSize: 18 }}>You have no consultation history</Text>
-                </View>
-            );
-        } else {
+        if(profData !== undefined && consultationData !== undefined){
+
+            const date = new Date(consultationData.date);
+    
             return (
                 <View style={style.container}>
                     <View style={style.desc}>
@@ -109,7 +108,7 @@ export default function HistoryCard({
                             <Text style={{ fontSize: 11 }}>{profData!.name}</Text>
                         </View>
                         <View>
-                            <Text style={{ fontSize: 13 }}>{consultationData!.date.toDateString()}</Text>
+                            <Text style={{ fontSize: 13 }}>{date.toDateString()}</Text>
                         </View>
                     </View>
                     <View style={style.buttonContainer}>
@@ -128,6 +127,12 @@ export default function HistoryCard({
                             Chat History &gt;
                         </Button>
                     </View>
+                </View>
+            );
+        }else{
+            return (
+                <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+                    <Text style={{ fontSize: 18 }}>Please wait...</Text>
                 </View>
             );
         }
