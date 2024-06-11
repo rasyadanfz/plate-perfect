@@ -16,6 +16,56 @@ import { useEffect } from "react";
 export default function Home() {
     const { user, role, accessToken } = useAuth();
     const safeInsets = useSafeAreaInsets();
+    const [tempProfessional, setTempProfessional] = React.useState<Professional | null>(null);
+    const [userHistory, setUserHistory] = React.useState<Booking[]>([]);
+    const [isLoading, setIsLoading] = React.useState(true);
+
+    useEffect(() => {
+        const fetchProfessional = async () => {
+            try {
+                const response = await axios({
+                    method: "GET",
+                    headers: {
+                        Authorization: `Bearer ${accessToken}`,
+                    },
+                    url: `${BACKEND_URL}/api/professional/getOneProfessional`,
+                });
+                setTempProfessional(response.data.data);
+            } catch (error) {
+                console.log("getOne");
+                console.log(error);
+            }
+        };
+
+        const fetchUserHistory = async () => {
+            try {
+                const response = await axios({
+                    method: "GET",
+                    headers: {
+                        Authorization: `Bearer ${accessToken}`,
+                    },
+                    url: `${BACKEND_URL}/api/booking/oneUserHistory`,
+                });
+
+                const response2 = await axios({
+                    method: "GET",
+                    headers: {
+                        Authorization: `Bearer ${accessToken}`,
+                    },
+                    url: `${BACKEND_URL}/api/booking/userHistory`,
+                })
+                setUserHistory(response2.data.data);
+            } catch (error) {
+                console.log("oneHist");
+                console.log(error);
+            }
+        };
+        fetchProfessional();
+        setIsLoading  (false);
+        fetchUserHistory();
+    }, []);
+
+
     const style = StyleSheet.create({
         container: {
             paddingTop: safeInsets.top - 10,
@@ -127,7 +177,8 @@ export default function Home() {
                 <View style={style.sectionContainer}>
                     <View style={style.section}>
                         <Text style={style.subtitle}>Consultation History</Text>
-                        <Button
+                        {
+                            userHistory.length > 0 &&                         <Button
                             mode="contained"
                             style={{ backgroundColor: "#ecca9c" }}
                             labelStyle={{ fontSize: 10, lineHeight: 10, color: "black" }}
@@ -135,16 +186,20 @@ export default function Home() {
                         >
                             See All
                         </Button>
+                        }
+
                     </View>
                     {userHistory.length > 0 && (
                         <Text style={style.sectionItem}>Your last consultation history</Text>
                     )}
                     {userHistory.length > 0 ? (
+                        
                         <HistoryCard
                             role="USER"
                             type={userHistory[0].type}
                             booking_id={userHistory[0].booking_id}
                         />
+                        
                     ) : (
                         <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
                             <Text style={{ fontSize: 13, marginTop: 10, fontWeight: "bold" }}>

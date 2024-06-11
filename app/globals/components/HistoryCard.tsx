@@ -34,7 +34,7 @@ const style = StyleSheet.create({
         color: "black",
         fontSize: 10,
         lineHeight: 10,
-    },
+    }
 });
 
 export default function HistoryCard({
@@ -55,24 +55,12 @@ export default function HistoryCard({
         const [profData, setProfData] = useState<Professional>();
         const [consultationData, setConsultationData] = useState<Consultation>();
         const [isLoading, setIsLoading] = useState(true);
+        const [trig,setTrig] = useState(0)
         useEffect(() => {
-            const getProfData = async () => {
-                if (!consultationData?.professional_id) return;
-                try {
-                    const response = await axios({
-                        method: "GET",
-                        headers: {
-                            Authorization: `Bearer ${accessToken}`,
-                        },
-                        url: `${BACKEND_URL}/api/professional/getProfId/${consultationData?.professional_id}`,
-                    });
-                    setProfData(response.data.data);
-                } catch (error) {
-                    console.log("getProfId");
-                    console.log(error);
-                }
-            };
-            const getConsultationData = async () => {
+
+
+            const allinOneFunction = async()=>{
+                setIsLoading(true)
                 try {
                     const response = await axios({
                         method: "GET",
@@ -81,39 +69,70 @@ export default function HistoryCard({
                         },
                         url: `${BACKEND_URL}/api/consultation/getConsultationWithBookingId/${booking_id}`,
                     });
-                    setConsultationData(response.data.data);
+
+                    if(response.data.data){
+                        setConsultationData(response.data.data)
+                    }else{
+                        console.log("THERE IS NO CONSULTATION DATA")
+                        return;
+                    }
+                    
                 } catch (error) {
-                    console.log("getConsultationDataBookID");
+                    console.log("GetConsultationWithBookingID");
                     console.log(error);
                 }
-            };
-            getConsultationData();
-            getProfData();
-            setIsLoading(false);
-        });
 
-        if (isLoading) {
-            return (
-                <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-                    <Text style={{ fontSize: 18 }}>Please wait...</Text>
-                </View>
-            );
-        } else if (!consultationData) {
-            return (
-                <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-                    <Text style={{ fontSize: 18, marginTop: 20 }}>You have no consultation history</Text>
-                </View>
-            );
-        } else {
+                try {
+                    setIsLoading(true)
+                    const response = await axios({
+                        method: "GET",
+                        headers: {
+                            Authorization: `Bearer ${accessToken}`,
+                        },
+                        url: `${BACKEND_URL}/api/professional/getProfId/${consultationData?.professional_id}`,
+                    });
+
+                    if(response){
+                        setProfData(response.data.data)
+                    }else{
+                        console.log("THERE IS NO PROF DATA")
+                    }
+                    
+                } catch (error) {
+                    console.log("getProfId");
+                    console.log(error);
+                }finally{
+                    setIsLoading(false)
+                    if(trig < 1){
+                        setTrig(trig+1)
+                    }
+                }
+            }
+
+            allinOneFunction()
+        },[trig]);
+
+
+        if(isLoading === false && consultationData && profData ){
+
+            const date = new Date(consultationData.date);
+
+            const startDate = new Date(consultationData.start_time);
+const endDate = new Date(consultationData.end_time);
+
+const startHourMinute = `${startDate.getUTCHours().toString().padStart(2, '0')}:${startDate.getUTCMinutes().toString().padStart(2, '0')}`;
+const endHourMinute = `${endDate.getUTCHours().toString().padStart(2, '0')}:${endDate.getUTCMinutes().toString().padStart(2, '0')}`;
+            
             return (
                 <View style={style.container}>
                     <View style={style.desc}>
                         <View style={style.title}>
                             <Text style={{ fontSize: 14 }}>Konsultasi {type}</Text>
-                            <Text style={{ fontSize: 11 }}>{profData!.name}</Text>
+                            <Text style={{ fontSize: 11 }}>{profData.name}</Text>
                         </View>
-                        <View>
-                            <Text style={{ fontSize: 13 }}>{consultationData!.date.toDateString()}</Text>
+                        <View >
+                            <Text style={{ fontSize: 13, textAlign:"right" }}>{date.toDateString()}</Text>
+                            <Text style={{fontSize:13, textAlign:"right"}}>{startHourMinute} - {endHourMinute} </Text>
                         </View>
                     </View>
                     <View style={style.buttonContainer}>
@@ -132,6 +151,13 @@ export default function HistoryCard({
                             Chat History &gt;
                         </Button>
                     </View>
+                </View>
+            );
+        }else{
+        
+            return (
+                <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+                    <Text style={{ fontSize: 18 }}>Please wait...</Text>
                 </View>
             );
         }
