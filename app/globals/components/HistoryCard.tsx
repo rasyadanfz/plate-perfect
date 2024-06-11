@@ -236,7 +236,7 @@ export default function HistoryCard({
                             mode="contained"
                             style={{ flex: 1, backgroundColor: "#ecca9c" }}
                             labelStyle={style.buttonText}
-                            onPress={()=>{() => handleSummary(consultation!.consultation_id)}}
+                            onPress={() => handleSummary(consultation!.consultation_id)}
                         >
                             Summary &gt;
                         </Button>

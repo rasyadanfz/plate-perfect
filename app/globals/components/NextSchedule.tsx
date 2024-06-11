@@ -173,6 +173,9 @@ export default function NextSchedule({ role }: { role: string }) {
                 </View>
             );
         } else {
+            const consultTime = new Date(consultationData.start_time);
+            const hour = consultTime.getHours()
+            consultTime.setHours(hour - 7)
             return (
                 <View style={style.container}>
                     <View style={style.desc}>
@@ -188,8 +191,8 @@ export default function NextSchedule({ role }: { role: string }) {
                         <DetailCard text="45 Minute" />
                         <Text style={{ fontSize: 12, fontWeight: "bold" }}>
                             {new Date(consultationData?.start_time).toDateString() +
-                                " " +
-                                new Date(consultationData?.start_time).toLocaleTimeString()}
+                                " " +consultTime.toLocaleTimeString()
+                            }
                         </Text>
                     </View>
                 </View>
@@ -292,6 +295,9 @@ export default function NextSchedule({ role }: { role: string }) {
         }
 
         if (consultationData && booking && customerData) {
+            const consultTime = new Date(consultationData.start_time);
+            const hour = consultTime.getHours()
+            consultTime.setHours(hour - 7)
             return (
                 <View style={style.container}>
                     <View style={style.desc}>
@@ -310,7 +316,7 @@ export default function NextSchedule({ role }: { role: string }) {
                                 <Text style={{ fontSize: 12, fontWeight: "bold" }}>
                                     {new Date(consultationData.start_time).toDateString() +
                                         " " +
-                                        new Date(consultationData?.start_time).toLocaleTimeString()}
+                                        consultTime.toLocaleTimeString()}
                                 </Text>
                             </>
                         )}
