@@ -166,7 +166,7 @@ export default function HistoryCard({
                             mode="contained"
                             style={{ flex: 1, backgroundColor: "#ecca9c" }}
                             labelStyle={style.buttonText}
-                            onPress={()=>handleChatHistoryPress(consultationData.consultation_id)}
+                            onPress={() => handleChatHistoryPress(consultationData.consultation_id)}
                         >
                             Chat History &gt;
                         </Button>
@@ -184,9 +184,11 @@ export default function HistoryCard({
         const [userData, setUserData] = useState<User>();
         const [isLoading, setIsLoading] = useState(true);
         const { accessToken } = useAuth();
+        const consultationDate = new Date(consultation!.start_time);
+        consultationDate.setHours(consultationDate.getHours() - 7);
 
         useEffect(() => {
-           // console.log(userData);
+            // console.log(userData);
             const getUserData = async () => {
                 try {
                     const response = await axios({
@@ -196,26 +198,26 @@ export default function HistoryCard({
                         },
                         url: `${BACKEND_URL}/api/profile/user/${consultation!.customer_id}`,
                     });
-                    console.log(response.data.data)
+                    console.log(response.data.data);
                     setUserData(response.data.data);
-                    setIsLoading(false)
+                    setIsLoading(false);
                 } catch (error) {
                     console.log("getUserData");
                     console.log(error);
                 }
             };
-            getUserData().then(()=>{setIsLoading(false)})
+            getUserData().then(() => {
+                setIsLoading(false);
+            });
         }, []);
 
         if (isLoading || !userData) {
-            
             return (
                 <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
                     <Text style={{ fontSize: 18 }}>Please wait...</Text>
                 </View>
             );
         } else {
-
             return (
                 <View style={style.container}>
                     <View style={style.desc}>
@@ -227,7 +229,7 @@ export default function HistoryCard({
                             <Text style={{ fontSize: 11 }}>
                                 {new Date(consultation!.start_time).toDateString() +
                                     " " +
-                                    new Date(consultation!.start_time).toLocaleTimeString()}
+                                    consultationDate.toLocaleTimeString()}
                             </Text>
                         </View>
                     </View>
