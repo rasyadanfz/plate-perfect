@@ -15,30 +15,26 @@ import { IAppointment } from "@dgreasi/react-native-time-slot-picker";
 import axios from "axios";
 import { BACKEND_URL } from "@env";
 
-
-export default function bookingDetails(){
-
-  
+export default function bookingDetails() {
     const [tempProfessional, setTempProfessional] = React.useState<Professional>();
     const [slotAppointment, setSlotAppointment] = React.useState<IAppointment>();
     const fetchProfessional = useLocalSearchParams();
-    useEffect(()=>{
-      const {professional} = fetchProfessional;
-      let deserializedProfessional:Professional;
-      if(professional){
-          deserializedProfessional = JSON.parse(professional as string);
-          setTempProfessional(deserializedProfessional);
-      }
-      
-      const {dateOfAppointment} = fetchProfessional
-      let deserializedDateOfAppointment;
+    useEffect(() => {
+        const { professional } = fetchProfessional;
+        let deserializedProfessional: Professional;
+        if (professional) {
+            deserializedProfessional = JSON.parse(professional as string);
+            setTempProfessional(deserializedProfessional);
+        }
 
-      if(dateOfAppointment){
-         deserializedDateOfAppointment = JSON.parse(dateOfAppointment as string);
-        setSlotAppointment(deserializedDateOfAppointment)
-      }
-    },[])
+        const { dateOfAppointment } = fetchProfessional;
+        let deserializedDateOfAppointment;
 
+        if (dateOfAppointment) {
+            deserializedDateOfAppointment = JSON.parse(dateOfAppointment as string);
+            setSlotAppointment(deserializedDateOfAppointment);
+        }
+    }, []);
 
     const safeInsets = useSafeAreaInsets();
     const style = StyleSheet.create({
@@ -51,168 +47,156 @@ export default function bookingDetails(){
             flex: 1,
             rowGap: 20,
         },
-        bookConsult:{
-            fontSize:18,
+        bookConsult: {
+            fontSize: 18,
         },
-        userName:{
-            fontSize:22,
-            fontWeight:"bold",
-            marginVertical:5
-        }, divider:{
-            marginTop:10,
-            marginBottom:8,
-            borderStyle:"solid",
+        userName: {
+            fontSize: 22,
+            fontWeight: "bold",
+            marginVertical: 5,
+            marginBottom: 10,
         },
-        feeContainer:{
-            display:"flex",
-            flexDirection:"row",
-            justifyContent:"space-between",
-            marginBottom:5,
-            marginTop:10,
-        },feeLeftContainer:{
-            display:"flex",
-            flexDirection:"column",
-            justifyContent:"space-between",
-            marginLeft:15,
-        }, feeText:{
-            fontSize:17,
-            marginVertical:5,
-        }, feeTobePaid:{
-            fontSize:17,
-            fontWeight:"bold",
-            marginVertical:5,
-        },paymentContainer:{
-            marginTop:20,
-        },paymentText:{
-            fontSize:17,
-            marginVertical:5,
-            fontWeight:"bold",
-        }
+        divider: {
+            marginTop: 10,
+            marginBottom: 8,
+            borderStyle: "solid",
+        },
+        feeContainer: {
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "space-between",
+            marginBottom: 5,
+            marginTop: 10,
+        },
+        feeLeftContainer: {
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "space-between",
+            marginLeft: 15,
+        },
+        feeText: {
+            fontSize: 17,
+            marginVertical: 5,
+        },
+        feeTobePaid: {
+            fontSize: 17,
+            fontWeight: "bold",
+            marginVertical: 5,
+        },
+        paymentContainer: {
+            marginTop: 20,
+        },
+        paymentText: {
+            fontSize: 17,
+            marginVertical: 5,
+            fontWeight: "bold",
+        },
     });
 
-    const {user, role, accessToken} = useAuth();
+    const { user, role, accessToken } = useAuth();
 
-    const [checked, setChecked] = useState("CASH")
+    const [checked, setChecked] = useState("CASH");
 
-    const createBooking = async() =>{
-        try{
-            console.log("POST",slotAppointment)
+    const createBooking = async () => {
+        try {
+            console.log("POST", slotAppointment);
             const res = await axios({
                 method: "POST",
                 url: `${BACKEND_URL}/api/booking/createBooking`,
-                headers:{
-                    Authorization : `Bearer ${accessToken}`,
+                headers: {
+                    Authorization: `Bearer ${accessToken}`,
                 },
-                data:{
+                data: {
                     professional_id: tempProfessional?.professional_id,
-                    dateOfAppointment: slotAppointment
-                }
-            })   
-            
-            
-            if(res.data.success){
+                    dateOfAppointment: slotAppointment,
+                },
+            });
+
+            if (res.data.success) {
                 // create the payment
-                console.log("Booking created")
+                console.log("Booking created");
 
                 const res2 = await axios({
-                    method:"POST",
+                    method: "POST",
                     url: `${BACKEND_URL}/api/payment/createPayment`,
-                    headers:{
+                    headers: {
                         Authorization: `Bearer ${accessToken}`,
                     },
-                    data:{
-                        booking_id:res.data.query.booking_id,
-                        method:checked,
-                        amount: (tempProfessional?.experience == undefined ? 1 : tempProfessional?.experience)*10000 + 3000
-                    }
-                })
+                    data: {
+                        booking_id: res.data.query.booking_id,
+                        method: checked,
+                        amount:
+                            (tempProfessional?.experience == undefined
+                                ? 1
+                                : tempProfessional?.experience) *
+                                10000 +
+                            3000,
+                    },
+                });
 
-                if(res2.data.success){
-                    console.log("Payment created")
-                }else{
-                    console.log("Payment failed ")
+                if (res2.data.success) {
+                    console.log("Payment created");
+                } else {
+                    console.log("Payment failed ");
                 }
-            }else{
-                console.log("Booking failed")   
+            } else {
+                console.log("Booking failed");
             }
-            
-
-        }catch(err){
-            console.log(err)
+        } catch (err) {
+            console.log(err);
         }
+    };
 
-
-    }
-
-    const handleOnPress = async() =>{
-        try{
+    const handleOnPress = async () => {
+        try {
             await createBooking();
-            router.navigate("home")
-        }catch(err){
-            console.log(err)
+            router.navigate("home");
+        } catch (err) {
+            console.log(err);
         }
+    };
+
+    if (!tempProfessional) {
+        return (
+            <View>
+                <Text>Loading</Text>
+            </View>
+        );
     }
-
-    
-    if(!tempProfessional){
-        return (<View>
-          <Text>Loading</Text>
-        </View>
-        )
-      }
     return (
-
         <View style={style.container}>
             <View>
-                <Text style={style.bookConsult}>
-                    Book Consultation For
-                </Text>
-                <Text style={style.userName}>
-                    {user?.name}
-                </Text>
-                <ProfessionalCard2 {...tempProfessional}/>
-                <Divider style={style.divider} bold={true} theme={{colors:{primary:'black'}}}/>
+                <Text style={style.bookConsult}>Book Consultation For</Text>
+                <Text style={style.userName}>{user?.name}</Text>
+                <ProfessionalCard2 {...tempProfessional} />
+                <Divider style={style.divider} bold={true} theme={{ colors: { primary: "black" } }} />
                 <View style={style.feeContainer}>
                     <View style={style.feeLeftContainer}>
-                        <Text style={style.feeText}>
-                            Session Fee
-                        </Text>
-                        <Text style={style.feeText}>
-                            Service Fee
-                        </Text>
+                        <Text style={style.feeText}>Session Fee</Text>
+                        <Text style={style.feeText}>Service Fee</Text>
                     </View>
                     <View>
-                        <Text style={style.feeText}>
-                            Rp. {tempProfessional.experience*10000}
-                        </Text>
-                        <Text style={style.feeText}>
-                            Rp. 3000
-                        </Text>
+                        <Text style={style.feeText}>Rp. {tempProfessional.experience * 10000}</Text>
+                        <Text style={style.feeText}>Rp. 3000</Text>
                     </View>
                 </View>
-                <Divider style={style.divider} bold={true} theme={{colors:{primary:'black'}}}/>
+                <Divider style={style.divider} bold={true} theme={{ colors: { primary: "black" } }} />
                 <View style={style.feeContainer}>
                     <View>
-                        <Text style={style.feeTobePaid}>
-                            To be paid
-                        </Text>
+                        <Text style={style.feeTobePaid}>To be paid</Text>
                     </View>
                     <View>
                         <Text style={style.feeTobePaid}>
-                            Rp. {tempProfessional.experience*10000 + 3000}
+                            Rp. {tempProfessional.experience * 10000 + 3000}
                         </Text>
                     </View>
                 </View>
                 <View style={style.paymentContainer}>
-                    <Text style={style.paymentText}>
-                        Choose Payment Method 
-                    </Text>
-                    <PaymentMethod setState={setChecked} state={checked}/>
+                    <Text style={style.paymentText}>Choose Payment Method</Text>
+                    <PaymentMethod setState={setChecked} state={checked} />
                 </View>
-                <ContinueButton title="Pay & Confirm" onPress={handleOnPress}
-                /> 
-                
+                <ContinueButton title="Pay & Confirm" onPress={handleOnPress} />
             </View>
         </View>
-    )   
+    );
 }

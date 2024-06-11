@@ -1,7 +1,8 @@
 export type ChatBubbleProps = {
     id: string;
     message: string;
-    isSelf: boolean;
+    sender_id: string;
+    time: Date;
 };
 
 export type Message = {

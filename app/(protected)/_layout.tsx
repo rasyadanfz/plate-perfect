@@ -40,6 +40,15 @@ export default function ProtectedLayout() {
     return (
         <Stack screenOptions={{ headerShown: false }}>
             <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+            <Stack.Screen
+                name="chat/[id]"
+                options={{
+                    headerShown: true,
+                    headerTitle: "Consultation Chatroom",
+                    headerStyle: { backgroundColor: "#404c4c" },
+                    headerTintColor: "white",
+                }}
+            />
         </Stack>
     );
 }

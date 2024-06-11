@@ -6,6 +6,7 @@ import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import { useAuth } from "../../context/AuthProvider";
 import { useEffect, useState } from "react";
 import { Booking, Consultation, Professional, User } from "../../../types/dbTypes";
+import { router } from "expo-router";
 
 const style = StyleSheet.create({
     container: {
@@ -44,9 +45,17 @@ const style = StyleSheet.create({
     },
 });
 
-function ConsultButton() {
+function ConsultButton({ chatRoomID }: { chatRoomID: string }) {
+    const handlePress = () => {
+        router.push(`/chat/${chatRoomID}`);
+    };
     return (
-        <Button mode="contained" style={{ backgroundColor: "#ecca9c" }} labelStyle={style.buttonText}>
+        <Button
+            mode="contained"
+            style={{ backgroundColor: "#ecca9c" }}
+            labelStyle={style.buttonText}
+            onPress={handlePress}
+        >
             Consult &gt;
         </Button>
     );
@@ -59,6 +68,7 @@ function DetailCard({ text }: { text: string }) {
         </View>
     );
 }
+
 export default function NextSchedule({ role }: { role: string }) {
     const { accessToken } = useAuth();
     if (role.toLowerCase() === "user") {
@@ -66,6 +76,7 @@ export default function NextSchedule({ role }: { role: string }) {
         const [bookingData, setBookingData] = useState<Booking>();
         const [profData, setProfData] = useState<Professional>();
         const [isLoading, setIsLoading] = useState(true);
+        const [chatRoomId, setChatRoomId] = useState<string>("");
         useEffect(() => {
             let tempBooking: Booking[], tempConsultation: Consultation;
             const getOnePaidBooking = async () => {
@@ -81,6 +92,22 @@ export default function NextSchedule({ role }: { role: string }) {
                     return tempBooking;
                 } catch (error) {
                     console.log("HERE1");
+                    console.log(error);
+                }
+            };
+
+            const getID = async (consultationId: string) => {
+                try {
+                    const response = await axios({
+                        method: "GET",
+                        headers: {
+                            Authorization: `Bearer ${accessToken}`,
+                        },
+                        url: `${BACKEND_URL}/api/chatRoom/${consultationId}`,
+                    });
+                    const chatRoomId = response.data.data.chat_id;
+                    setChatRoomId(chatRoomId);
+                } catch (error) {
                     console.log(error);
                 }
             };
@@ -122,8 +149,10 @@ export default function NextSchedule({ role }: { role: string }) {
             };
             const getData = async () => {
                 const tempBook = await getOnePaidBooking();
+                if (!tempBook || !tempBook.length) return;
                 const tempConsultation = await getConsultationData(tempBook!);
                 await getProfData(tempConsultation!);
+                await getID(tempConsultation!.consultation_id);
             };
 
             getData();
@@ -152,15 +181,15 @@ export default function NextSchedule({ role }: { role: string }) {
                             <Text style={{ fontSize: 11 }}>{profData?.name}</Text>
                         </View>
                         <View>
-                            <ConsultButton />
+                            <ConsultButton chatRoomID={chatRoomId} />
                         </View>
                     </View>
                     <View style={style.detailContainer}>
                         <DetailCard text="45 Minute" />
                         <Text style={{ fontSize: 12, fontWeight: "bold" }}>
-                            {new Date(consultationData?.date).toDateString() +
+                            {new Date(consultationData?.start_time).toDateString() +
                                 " " +
-                                new Date(consultationData?.date).toLocaleTimeString()}
+                                new Date(consultationData?.start_time).toLocaleTimeString()}
                         </Text>
                     </View>
                 </View>
@@ -171,6 +200,7 @@ export default function NextSchedule({ role }: { role: string }) {
         const [booking, setBooking] = useState<Booking>();
         const [customerData, setCustomerData] = useState<User>();
         const [isLoading, setIsLoading] = useState(true);
+        const [chatRoomId, setChatRoomId] = useState<string>("");
 
         useEffect(() => {
             // Get the next schedule
@@ -208,6 +238,23 @@ export default function NextSchedule({ role }: { role: string }) {
                 }
             };
 
+            const getID = async (consultationId: string) => {
+                try {
+                    const response = await axios({
+                        method: "GET",
+                        headers: {
+                            Authorization: `Bearer ${accessToken}`,
+                        },
+                        url: `${BACKEND_URL}/api/chatRoom/${consultationId}`,
+                    });
+                    const chatRoomId = response.data.data.chat_id;
+                    setChatRoomId(chatRoomId);
+                } catch (err) {
+                    console.log("getID");
+                    console.log(err);
+                }
+            };
+
             const getBooking = async (bookId: string) => {
                 try {
                     const response = await axios({
@@ -226,12 +273,11 @@ export default function NextSchedule({ role }: { role: string }) {
 
             const getData = async () => {
                 const consultData = await getConsultationData();
+                console.log("HERE");
                 if (!consultData || !consultData.length) return;
-                console.log("TEST10");
                 await getBooking(consultData[0].booking_id);
-                console.log("TEST2");
                 await getUserData(consultData[0].customer_id);
-                console.log("TEST3");
+                await getID(consultData[0].consultation_id);
             };
 
             getData();
@@ -254,7 +300,7 @@ export default function NextSchedule({ role }: { role: string }) {
                             <Text style={{ fontSize: 11 }}>Client: {customerData?.name}</Text>
                         </View>
                         <View>
-                            <ConsultButton />
+                            <ConsultButton chatRoomID={chatRoomId} />
                         </View>
                     </View>
                     <View style={style.detailContainer}>

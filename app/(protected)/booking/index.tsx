@@ -200,6 +200,9 @@ export default function Booking() {
                     availableDates={availableDates}
                     setDateOfAppointment={setDateOfAppointment}
                     timeSlotsTitle="Select a time slot"
+                    datePickerBackgroundColor="#e8efcf"
+                    timeSlotsBackgroundColor="#e8efcf"
+                    timeSlotWidth={150}
                 />
             </View>
             <ContinueButton
