@@ -125,7 +125,7 @@ export const SummaryPage = () => {
           })
         
           
-          setProfessional(response.data.data)
+            setProfessional(response.data.data)
         }catch(err){
           console.log("Fetch Professional error")
           console.log(err)

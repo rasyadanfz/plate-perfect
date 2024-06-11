@@ -186,7 +186,7 @@ export default function HistoryCard({
         const { accessToken } = useAuth();
 
         useEffect(() => {
-            console.log(user_id);
+           // console.log(userData);
             const getUserData = async () => {
                 try {
                     const response = await axios({
@@ -194,25 +194,28 @@ export default function HistoryCard({
                         headers: {
                             Authorization: `Bearer ${accessToken}`,
                         },
-                        url: `${BACKEND_URL}/api/profile/user/${user_id}`,
+                        url: `${BACKEND_URL}/api/profile/user/${consultation!.customer_id}`,
                     });
+                    console.log(response.data.data)
                     setUserData(response.data.data);
-                    setIsLoading(false);
+                    setIsLoading(false)
                 } catch (error) {
                     console.log("getUserData");
                     console.log(error);
                 }
             };
-            getUserData();
+            getUserData().then(()=>{setIsLoading(false)})
         }, []);
 
-        if (isLoading) {
+        if (isLoading || !userData) {
+            
             return (
                 <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
                     <Text style={{ fontSize: 18 }}>Please wait...</Text>
                 </View>
             );
         } else {
+
             return (
                 <View style={style.container}>
                     <View style={style.desc}>
@@ -233,6 +236,7 @@ export default function HistoryCard({
                             mode="contained"
                             style={{ flex: 1, backgroundColor: "#ecca9c" }}
                             labelStyle={style.buttonText}
+                            onPress={()=>{() => handleSummary(consultation!.consultation_id)}}
                         >
                             Summary &gt;
                         </Button>

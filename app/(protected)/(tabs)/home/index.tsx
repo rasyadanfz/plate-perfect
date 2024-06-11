@@ -314,12 +314,13 @@ export default function Home() {
                                 mode="contained"
                                 style={{ backgroundColor: "#ecca9c" }}
                                 labelStyle={{ fontSize: 10, lineHeight: 10, color: "black" }}
+                                onPress={() => router.push("/home/consultationHist")}
                             >
                                 See All
                             </Button>
                         </View>
                         {consultationList && (
-                            <Text style={style.sectionItem}>Your last 3 consultation history</Text>
+                            <Text style={style.sectionItem}>Your consultation history</Text>
                         )}
                         <View style={{ gap: 15 }}>
                             {!consultationList ? (
@@ -331,26 +332,26 @@ export default function Home() {
                                     </Text>
                                 </View>
                             ) : (
-                                consultationList!.map((consultation, index) => (
+                                
+
                                     <HistoryCard
-                                        key={index}
                                         role="PROFESSIONAL"
                                         type={
                                             bookingList!.filter(
                                                 (booking) =>
-                                                    booking.booking_id === consultation.booking_id
+                                                    booking.booking_id === consultationList[0].booking_id
                                             )[0].type
                                         }
-                                        booking_id={consultation.booking_id}
+                                        booking_id={consultationList[0].booking_id}
                                         user_id={
                                             bookingList!.filter(
                                                 (booking) =>
-                                                    booking.booking_id === consultation.booking_id
+                                                    booking.booking_id === consultationList[0].booking_id
                                             )[0].customer_id
                                         }
-                                        consultation={consultation}
+                                        consultation={consultationList[0]}
                                     />
-                                ))
+                                
                             )}
                         </View>
                     </View>
