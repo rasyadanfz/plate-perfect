@@ -320,7 +320,7 @@ export default function Home() {
                             </Button>
                         </View>
                         {consultationList && (
-                            <Text style={style.sectionItem}>Your last {consultationList.length} consultation history</Text>
+                            <Text style={style.sectionItem}>Your consultation history</Text>
                         )}
                         <View style={{ gap: 15 }}>
                             {!consultationList ? (
