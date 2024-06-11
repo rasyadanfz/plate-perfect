@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { useAuth } from "../../context/AuthProvider";
 import { BACKEND_URL } from "@env";
+import { router } from "expo-router";
 
 const style = StyleSheet.create({
     container: {
@@ -50,12 +51,23 @@ export default function HistoryCard({
     user_id?: string;
     consultation?: Consultation;
 }) {
+
+    const handleSummary = (consultation_id:string) =>{
+        router.push({
+            params:{
+                consultation_id,
+            },
+            pathname:"/summary"
+        })
+    }
+
     if (role.toLowerCase() === "user") {
         const { accessToken } = useAuth();
         const [profData, setProfData] = useState<Professional>();
         const [consultationData, setConsultationData] = useState<Consultation>();
         const [isLoading, setIsLoading] = useState(true);
         const [trig,setTrig] = useState(0)
+
         useEffect(() => {
 
 
@@ -140,6 +152,7 @@ const endHourMinute = `${endDate.getUTCHours().toString().padStart(2, '0')}:${en
                             mode="contained"
                             style={{ flex: 1, backgroundColor: "#ecca9c" }}
                             labelStyle={style.buttonText}
+                            onPress={()=>handleSummary(consultationData.consultation_id)}
                         >
                             Summary &gt;
                         </Button>
@@ -213,7 +226,8 @@ const endHourMinute = `${endDate.getUTCHours().toString().padStart(2, '0')}:${en
                             mode="contained"
                             style={{ flex: 1, backgroundColor: "#ecca9c" }}
                             labelStyle={style.buttonText}
-                        >
+                            
+                            >
                             Summary &gt;
                         </Button>
                         <Button

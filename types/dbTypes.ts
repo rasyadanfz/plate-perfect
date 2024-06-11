@@ -84,9 +84,7 @@ export type Consultation = {
 export type Summary = {
     summary_id: string;
     content: string;
-    professional: Professional;
     professional_id: string;
-    consultation: Consultation;
     consultation_id: string;
 };
 
