@@ -152,7 +152,7 @@ const endHourMinute = `${endDate.getUTCHours().toString().padStart(2, '0')}:${en
                             mode="contained"
                             style={{ flex: 1, backgroundColor: "#ecca9c" }}
                             labelStyle={style.buttonText}
-                            onPress={()=>handleSummary(consultationData.booking_id)}
+                            onPress={()=>handleSummary(consultationData.consultation_id)}
                         >
                             Summary &gt;
                         </Button>
