@@ -60,8 +60,8 @@ export default function HistoryCard({
         });
     };
 
-    const handleChatHistoryPress = () => {
-        router.push(`/chat/history/${consultation?.consultation_id}`);
+    const handleChatHistoryPress = (consultation_id: string) => {
+        router.push(`/chat/history/${consultation_id}`);
     };
     if (role.toLowerCase() === "user") {
         const { accessToken } = useAuth();
@@ -166,7 +166,7 @@ export default function HistoryCard({
                             mode="contained"
                             style={{ flex: 1, backgroundColor: "#ecca9c" }}
                             labelStyle={style.buttonText}
-                            onPress={handleChatHistoryPress}
+                            onPress={()=>handleChatHistoryPress(consultationData.consultation_id)}
                         >
                             Chat History &gt;
                         </Button>
@@ -240,7 +240,7 @@ export default function HistoryCard({
                             mode="contained"
                             style={{ flex: 1, backgroundColor: "#ecca9c" }}
                             labelStyle={style.buttonText}
-                            onPress={handleChatHistoryPress}
+                            onPress={() => handleChatHistoryPress(consultation!.consultation_id)}
                         >
                             Chat History &gt;
                         </Button>

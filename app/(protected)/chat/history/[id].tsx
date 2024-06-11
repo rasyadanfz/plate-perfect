@@ -27,6 +27,7 @@ const chatHistory = () => {
     const [messages, setMessages] = useState<Message[]>([]);
     const [otherPersonName, setOtherPersonName] = useState<string>("");
 
+    console.log("ID",id)
     useEffect(() => {
         const fetchMessages = async () => {
             try {
