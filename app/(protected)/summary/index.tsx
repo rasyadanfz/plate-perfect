@@ -78,7 +78,7 @@ export const SummaryPage = () => {
   const [iteration,setIteraation] = useState(0)
 
   
-  useEffect(()=>{
+  useEffect( ()=>{
 
       const fetchSummary = async() =>{
           try{
@@ -124,7 +124,6 @@ export const SummaryPage = () => {
             }
           })
         
-
           
           setProfessional(response.data.data)
         }catch(err){
@@ -134,8 +133,9 @@ export const SummaryPage = () => {
       }
 
       fetchSummary();
-      fetchConsultation();
-      fetchProfessional();
+       fetchConsultation();
+       fetchProfessional();
+       
       if(iteration < 12){
           setIteraation(iteration+1)
       }

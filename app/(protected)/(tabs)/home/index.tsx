@@ -88,7 +88,7 @@ export default function Home() {
                     headers: {
                         Authorization: `Bearer ${accessToken}`,
                     },
-                    url: `${BACKEND_URL}/api/booking/oneUserHistory`,
+                    url: `${BACKEND_URL}/api/booking/userHistory`,
                 });
                 setUserHistory(response.data.data);
             } catch (error) {
