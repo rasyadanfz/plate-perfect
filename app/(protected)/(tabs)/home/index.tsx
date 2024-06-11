@@ -314,12 +314,13 @@ export default function Home() {
                                 mode="contained"
                                 style={{ backgroundColor: "#ecca9c" }}
                                 labelStyle={{ fontSize: 10, lineHeight: 10, color: "black" }}
+                                onPress={() => router.push("/home/consultationHist")}
                             >
                                 See All
                             </Button>
                         </View>
                         {consultationList && (
-                            <Text style={style.sectionItem}>Your last 3 consultation history</Text>
+                            <Text style={style.sectionItem}>Your last {consultationList.length} consultation history</Text>
                         )}
                         <View style={{ gap: 15 }}>
                             {!consultationList ? (

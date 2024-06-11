@@ -1,6 +1,6 @@
 import { View, Text } from "react-native";
 import React, { useEffect, useState } from "react";
-import { Booking } from "../../../../types/dbTypes";
+import { Booking, Consultation } from "../../../../types/dbTypes";
 import { BACKEND_URL } from "@env";
 import axios from "axios";
 import { StyleSheet } from "react-native";
@@ -18,7 +18,9 @@ const style = StyleSheet.create({
 })
 
 const consultationHist = () => {
+    const {role} = useAuth();
 
+    if(role === "USER"){
     // fetch all booking first
     const [allBookingDone, setAllBookingDone] = useState<Booking[]>([]);
 
@@ -48,7 +50,7 @@ const consultationHist = () => {
         fetchBooking();
     },[])
     
-    const {role} = useAuth();
+
     // need role, type, and booking_id
     return (
         <View style={style.allContainer}>
@@ -69,6 +71,15 @@ const consultationHist = () => {
             />
         </View>
     );
+    }else{
+        const [allConsultation, setAllConsultation] = useState<Consultation[]>([]);
+        
+        useEffect(()=>{
+            const fetchdata = async () =>{
+                
+            }
+        })
+    }
 };
 
 export default consultationHist;
