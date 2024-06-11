@@ -43,19 +43,6 @@ export default function SignInPage() {
         password: "",
     });
 
-    const bypassSignIn1 = async () => {
-        const user = await signIn("Jon@jon.com", "jonjon", false);
-        if (user) {
-            router.replace("/home");
-        }
-    };
-    const bypassSignIn2 = async () => {
-        const user = await signIn("Kucinghugo@hugo.com", "kucinghugo", false);
-        if (user) {
-            router.replace("/home");
-        }
-    };
-
     const { signIn } = useAuth();
     const handleSignIn = async () => {
         let newErrors = {
@@ -162,12 +149,6 @@ export default function SignInPage() {
                     >
                         Don't have an account?
                     </Link>
-                    <Button mode="contained" onPress={bypassSignIn1}>
-                        Bypass User
-                    </Button>
-                    <Button mode="contained" onPress={bypassSignIn2} style={{ marginTop: 10 }}>
-                        Bypass Professional
-                    </Button>
                 </View>
             </View>
         </View>

@@ -332,26 +332,23 @@ export default function Home() {
                                     </Text>
                                 </View>
                             ) : (
-                                
-
-                                    <HistoryCard
-                                        role="PROFESSIONAL"
-                                        type={
-                                            bookingList!.filter(
-                                                (booking) =>
-                                                    booking.booking_id === consultationList[0].booking_id
-                                            )[0].type
-                                        }
-                                        booking_id={consultationList[0].booking_id}
-                                        user_id={
-                                            bookingList!.filter(
-                                                (booking) =>
-                                                    booking.booking_id === consultationList[0].booking_id
-                                            )[0].customer_id
-                                        }
-                                        consultation={consultationList[0]}
-                                    />
-                                
+                                <HistoryCard
+                                    role="PROFESSIONAL"
+                                    type={
+                                        bookingList!.filter(
+                                            (booking) =>
+                                                booking.booking_id === consultationList[0].booking_id
+                                        )[0].type
+                                    }
+                                    booking_id={consultationList[0].booking_id}
+                                    user_id={
+                                        bookingList!.filter(
+                                            (booking) =>
+                                                booking.booking_id === consultationList[0].booking_id
+                                        )[0].customer_id
+                                    }
+                                    consultation={consultationList[0]}
+                                />
                             )}
                         </View>
                     </View>
@@ -359,9 +356,6 @@ export default function Home() {
                         <Text style={style.subtitle}>Next Schedule</Text>
                         <NextSchedule role="PROFESSIONAL" />
                     </View>
-                    <Button mode="outlined" onPress={() => router.push("/summary/createSummary/2")}>
-                        Summary
-                    </Button>
                 </ScrollView>
             );
         }
