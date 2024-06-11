@@ -25,6 +25,7 @@ export default function ProfileCompletionProfessional() {
             paddingHorizontal: 20,
             paddingTop: insets.top + 30,
             paddingBottom: 10,
+            backgroundColor: "#e8efcf",
         },
         title: {
             fontSize: 32,

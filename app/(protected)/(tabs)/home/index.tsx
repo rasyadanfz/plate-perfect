@@ -7,8 +7,8 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import ProfessionalCard from "../../../globals/components/ProfessionalCard";
 import HistoryCard from "../../../globals/components/HistoryCard";
 import NextSchedule from "../../../globals/components/NextSchedule";
-import { Booking, Professional, ProfessionalRole, User } from "../../../../types/dbTypes";
-import React from "react";
+import { Booking, Consultation, Professional, ProfessionalRole, User } from "../../../../types/dbTypes";
+import React, { useState } from "react";
 import axios from "axios";
 import { BACKEND_URL } from "@env";
 import { useEffect } from "react";
@@ -16,7 +16,6 @@ import { useEffect } from "react";
 export default function Home() {
     const { user, role, accessToken } = useAuth();
     const safeInsets = useSafeAreaInsets();
-
     const [tempProfessional, setTempProfessional] = React.useState<Professional | null>(null);
     const [userHistory, setUserHistory] = React.useState<Booking[]>([]);
     const [isLoading, setIsLoading] = React.useState(true);
@@ -62,9 +61,10 @@ export default function Home() {
             }
         };
         fetchProfessional();
-        setIsLoading(false);
+        setIsLoading  (false);
         fetchUserHistory();
     }, []);
+
 
     const style = StyleSheet.create({
         container: {
@@ -102,16 +102,56 @@ export default function Home() {
         },
     });
 
-    if (isLoading) {
-        return (
-            <View style={style.container}>
-                <Text style={{ fontSize: 18 }}>Please wait...</Text>
-            </View>
-        );
-    }
-
     if (role === "USER") {
         const userData = user as User;
+
+        const [tempProfessional, setTempProfessional] = React.useState<Professional | null>(null);
+        const [userHistory, setUserHistory] = React.useState<Booking[]>([]);
+        const [isLoading, setIsLoading] = React.useState(true);
+
+        useEffect(() => {
+            const fetchProfessional = async () => {
+                try {
+                    const response = await axios({
+                        method: "GET",
+                        headers: {
+                            Authorization: `Bearer ${accessToken}`,
+                        },
+                        url: `${BACKEND_URL}/api/professional/getOneProfessional`,
+                    });
+                    setTempProfessional(response.data.data);
+                } catch (error) {
+                    console.log("getOne");
+                    console.log(error);
+                }
+            };
+
+            const fetchUserHistory = async () => {
+                try {
+                    const response = await axios({
+                        method: "GET",
+                        headers: {
+                            Authorization: `Bearer ${accessToken}`,
+                        },
+                        url: `${BACKEND_URL}/api/booking/oneUserHistory`,
+                    });
+                    setUserHistory(response.data.data);
+                } catch (error) {
+                    console.log("oneHist");
+                    console.log(error);
+                }
+            };
+            fetchProfessional();
+            fetchUserHistory();
+            setIsLoading(false);
+        }, []);
+        if (isLoading) {
+            return (
+                <View style={style.container}>
+                    <Text style={{ fontSize: 18 }}>Please wait...</Text>
+                </View>
+            );
+        }
         return (
             <ScrollView style={style.container}>
                 <View style={{ marginBottom: 20 }}>
@@ -149,7 +189,9 @@ export default function Home() {
                         }
 
                     </View>
-                    <Text style={style.sectionItem}>Your last consultation history</Text>
+                    {userHistory.length > 0 && (
+                        <Text style={style.sectionItem}>Your last consultation history</Text>
+                    )}
                     {userHistory.length > 0 ? (
                         
                         <HistoryCard
@@ -177,33 +219,155 @@ export default function Home() {
         );
     } else {
         const userData = user as Professional;
-        return (
-            <ScrollView style={style.container}>
-                <View style={{ marginBottom: 20 }}>
-                    <Text style={style.title}>Hi {userData.name} !</Text>
+        const [consultationList, setConsultationList] = useState<Consultation[]>();
+        const [bookingList, setBookingList] = useState<Booking[]>();
+        const [bookingIdSet, setBookingIdSet] = useState<Set<string>>(new Set());
+        const [isLoading, setIsLoading] = useState<boolean>(true);
+
+        useEffect(() => {
+            const fetchConsultationList = async () => {
+                try {
+                    const response = await axios({
+                        method: "GET",
+                        headers: {
+                            Authorization: `Bearer ${accessToken}`,
+                        },
+                        url: `${BACKEND_URL}/api/consultation/professionalConsultationList`,
+                    });
+
+                    const consultationData: Consultation[] = response.data.data;
+                    return consultationData;
+                } catch (error) {
+                    console.log("consultationList");
+                    console.log(error);
+                }
+            };
+
+            const fetchBookingsWithId = async (consultList: Consultation[]) => {
+                if (!consultList || !consultList.length) return;
+                try {
+                    // Paid bookings
+                    const promises = consultList.map((consult) => {
+                        console.log(consult.booking_id);
+                        return axios({
+                            method: "GET",
+                            headers: {
+                                Authorization: `Bearer ${accessToken}`,
+                            },
+                            url: `${BACKEND_URL}/api/booking/${consult.booking_id}`,
+                        });
+                    });
+
+                    const responses = await Promise.all(promises);
+                    const bookingList: Booking[] = responses.map((response) => response.data.data);
+                    setBookingList(bookingList);
+                    return bookingList;
+                } catch (error) {
+                    console.log("bookingList");
+                    console.log(error);
+                }
+            };
+
+            const getData = async () => {
+                const list = await fetchConsultationList();
+                const bookingList = await fetchBookingsWithId(list!);
+                const processData = async (bookingList: Booking[]) => {
+                    if (!bookingList) return;
+                    const tempSet = new Set<string>();
+                    bookingList?.forEach((booking) => {
+                        if (booking.status === "DONE") {
+                            tempSet.add(booking.booking_id);
+                        }
+                    });
+
+                    setBookingIdSet(tempSet);
+                    if (tempSet.size === 0) {
+                        return;
+                    }
+                    const finalList = list!.filter((consult) => tempSet.has(consult.booking_id));
+                    const finalBookingList = bookingList!.filter((booking) =>
+                        tempSet.has(booking.booking_id)
+                    );
+
+                    setConsultationList(finalList);
+                    setBookingList(finalBookingList);
+                };
+                if (!bookingList) return;
+                await processData(bookingList);
+            };
+
+            getData();
+            setIsLoading(false);
+        }, []);
+
+        if (isLoading) {
+            return (
+                <View style={style.container}>
+                    <Text style={{ fontSize: 18 }}>Please wait...</Text>
                 </View>
-                <View style={style.sectionContainer}>
-                    <View style={style.section}>
-                        <Text style={style.subtitle}>Consultation History</Text>
-                        <Button
-                            mode="contained"
-                            style={{ backgroundColor: "#ecca9c" }}
-                            labelStyle={{ fontSize: 10, lineHeight: 10, color: "black" }}
-                        >
-                            See All
-                        </Button>
+            );
+        } else {
+            return (
+                <ScrollView style={style.container}>
+                    <View style={{ marginBottom: 20 }}>
+                        <Text style={style.title}>Hi, {userData.name} !</Text>
                     </View>
-                    <Text style={style.sectionItem}>Your last consultation history</Text>
-                    {/* <HistoryCard role="PROFESSIONAL" /> */}
-                </View>
-                <View style={style.sectionContainer}>
-                    <Text style={style.subtitle}>Next Schedule</Text>
-                    <NextSchedule role="PROFESSIONAL" />
-                </View>
-                <Button mode="contained" onPress={() => router.push("/chat/1")}>
-                    Chat
-                </Button>
-            </ScrollView>
-        );
+                    <View style={style.sectionContainer}>
+                        <View style={style.section}>
+                            <Text style={style.subtitle}>Consultation History</Text>
+                            <Button
+                                mode="contained"
+                                style={{ backgroundColor: "#ecca9c" }}
+                                labelStyle={{ fontSize: 10, lineHeight: 10, color: "black" }}
+                            >
+                                See All
+                            </Button>
+                        </View>
+                        {consultationList && (
+                            <Text style={style.sectionItem}>Your last 3 consultation history</Text>
+                        )}
+                        <View style={{ gap: 15 }}>
+                            {!consultationList ? (
+                                <View
+                                    style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+                                >
+                                    <Text style={{ fontSize: 13, marginTop: 10, fontWeight: "bold" }}>
+                                        You have no consultation history
+                                    </Text>
+                                </View>
+                            ) : (
+                                consultationList!.map((consultation, index) => (
+                                    <HistoryCard
+                                        key={index}
+                                        role="PROFESSIONAL"
+                                        type={
+                                            bookingList!.filter(
+                                                (booking) =>
+                                                    booking.booking_id === consultation.booking_id
+                                            )[0].type
+                                        }
+                                        booking_id={consultation.booking_id}
+                                        user_id={
+                                            bookingList!.filter(
+                                                (booking) =>
+                                                    booking.booking_id === consultation.booking_id
+                                            )[0].customer_id
+                                        }
+                                        consultation={consultation}
+                                    />
+                                ))
+                            )}
+                        </View>
+                    </View>
+                    <View style={style.sectionContainer}>
+                        <Text style={style.subtitle}>Next Schedule</Text>
+                        <NextSchedule role="PROFESSIONAL" />
+                    </View>
+                    <Button mode="contained" onPress={() => router.push("/chat/1")}>
+                        Chat
+                    </Button>
+                </ScrollView>
+            );
+        }
     }
 }
