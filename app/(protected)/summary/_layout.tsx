@@ -7,15 +7,22 @@ import React from "react";
 export default function StackLayout() {
     const { user, role } = useAuth();
 
-
     return (
         <Stack>
             <Stack.Screen
                 name="index"
                 options={{
-                    headerTitle: "Booking",
-                    headerStyle: { backgroundColor: "#E8EFCF", },
-                    headerTintColor: "black",
+                    headerTitle: "Summary",
+                    headerStyle: { backgroundColor: "#404c4c" },
+                    headerTintColor: "white",
+                }}
+            />
+            <Stack.Screen
+                name="createSummary/[consultation_id]"
+                options={{
+                    headerTitle: "Create Summary",
+                    headerStyle: { backgroundColor: "#404c4c" },
+                    headerTintColor: "white",
                 }}
             />
         </Stack>

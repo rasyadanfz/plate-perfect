@@ -119,7 +119,7 @@ export default function ChatRoom() {
 
         function onEndByUser() {
             Alert.alert("Consultation Status", "Consultation has ended");
-            router.push("/summary");
+            router.push(`/summary/createSummary/${consultationData?.consultation_id}`);
         }
 
         socket.connect();
@@ -190,7 +190,7 @@ export default function ChatRoom() {
                     id: (user as Professional).professional_id,
                     role: role,
                 });
-                router.push("/summary");
+                router.push(`/summary/createSummary/${consultationData?.consultation_id}`);
             }
         } catch (error) {
             console.log("UpdateBookingDoneStatus");

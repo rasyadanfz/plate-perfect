@@ -358,6 +358,9 @@ export default function Home() {
                         <Text style={style.subtitle}>Next Schedule</Text>
                         <NextSchedule role="PROFESSIONAL" />
                     </View>
+                    <Button mode="outlined" onPress={() => router.push("/summary/createSummary/2")}>
+                        Summary
+                    </Button>
                 </ScrollView>
             );
         }
