@@ -16,54 +16,6 @@ import { useEffect } from "react";
 export default function Home() {
     const { user, role, accessToken } = useAuth();
     const safeInsets = useSafeAreaInsets();
-    const [tempProfessional, setTempProfessional] = React.useState<Professional | null>(null);
-    const [userHistory, setUserHistory] = React.useState<Booking[]>([]);
-    const [isLoading, setIsLoading] = React.useState(true);
-
-    useEffect(() => {
-        const fetchProfessional = async () => {
-            try {
-                const response = await axios({
-                    method: "GET",
-                    headers: {
-                        Authorization: `Bearer ${accessToken}`,
-                    },
-                    url: `${BACKEND_URL}/api/professional/getOneProfessional`,
-                });
-                setTempProfessional(response.data.data);
-            } catch (error) {
-                console.log("getOne");
-                console.log(error);
-            }
-        };
-
-        const fetchUserHistory = async () => {
-            try {
-                const response = await axios({
-                    method: "GET",
-                    headers: {
-                        Authorization: `Bearer ${accessToken}`,
-                    },
-                    url: `${BACKEND_URL}/api/booking/oneUserHistory`,
-                });
-
-                const response2 = await axios({
-                    method: "GET",
-                    headers: {
-                        Authorization: `Bearer ${accessToken}`,
-                    },
-                    url: `${BACKEND_URL}/api/booking/userHistory`,
-                })
-                setUserHistory(response2.data.data);
-            } catch (error) {
-                console.log("oneHist");
-                console.log(error);
-            }
-        };
-        fetchProfessional();
-        setIsLoading  (false);
-        fetchUserHistory();
-    }, []);
 
 
     const style = StyleSheet.create({
@@ -133,7 +85,7 @@ export default function Home() {
                         headers: {
                             Authorization: `Bearer ${accessToken}`,
                         },
-                        url: `${BACKEND_URL}/api/booking/oneUserHistory`,
+                        url: `${BACKEND_URL}/api/booking/userHistory`,
                     });
                     setUserHistory(response.data.data);
                 } catch (error) {
@@ -203,7 +155,7 @@ export default function Home() {
                     ) : (
                         <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
                             <Text style={{ fontSize: 13, marginTop: 10, fontWeight: "bold" }}>
-                                You have no consultation history
+                                You have no consultation history 
                             </Text>
                         </View>
                     )}
