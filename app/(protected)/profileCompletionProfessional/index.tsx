@@ -156,7 +156,12 @@ export default function ProfileCompletionProfessional() {
                     }
                     style={style.textInput}
                 />
-                <Button mode="contained" style={{ marginTop: 10 }} onPress={handleSave}>
+                <Button
+                    mode="contained"
+                    style={{ marginTop: 10, backgroundColor: "#ecca9c" }}
+                    labelStyle={{ color: "black" }}
+                    onPress={handleSave}
+                >
                     Save Profile
                 </Button>
                 <View
@@ -166,7 +171,12 @@ export default function ProfileCompletionProfessional() {
                     <Text style={{ textAlign: "center", paddingHorizontal: 15 }}>Or</Text>
                     <View style={{ flex: 1, backgroundColor: "black", height: 0.5 }}></View>
                 </View>
-                <Button mode="contained" onPress={handleLogout}>
+                <Button
+                    mode="contained"
+                    onPress={handleLogout}
+                    style={{ backgroundColor: "#ecca9c" }}
+                    labelStyle={{ color: "black" }}
+                >
                     Back to Login Screen
                 </Button>
             </ScrollView>

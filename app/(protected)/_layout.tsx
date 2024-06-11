@@ -49,6 +49,15 @@ export default function ProtectedLayout() {
                     headerTintColor: "white",
                 }}
             />
+            <Stack.Screen
+                name="chat/history/[id]"
+                options={{
+                    headerShown: true,
+                    headerTitle: "Chat History",
+                    headerStyle: { backgroundColor: "#404c4c" },
+                    headerTintColor: "white",
+                }}
+            />
         </Stack>
     );
 }

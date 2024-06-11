@@ -16,7 +16,7 @@ export default function Profile() {
         if (logout) {
             router.replace("/signIn");
         }
-    };  
+    };
 
     const ListButtonDisabled = ({ text }: { text: string }) => {
         return (
@@ -36,7 +36,7 @@ export default function Profile() {
     };
 
     const handleBookingHistory = () => {
-        // router.push("/bookings");
+        router.push("/profile/bookHistory");
     };
 
     interface ProfileButtonProps {

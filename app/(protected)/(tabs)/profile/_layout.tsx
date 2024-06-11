@@ -18,6 +18,13 @@ export default function ProfileLayout() {
                     headerBackVisible: true,
                 }}
             />
+            <Stack.Screen
+                name="bookHistory"
+                options={{
+                    headerTitle: "Booking History",
+                    headerBackVisible: true,
+                }}
+            />
         </Stack>
     );
 }

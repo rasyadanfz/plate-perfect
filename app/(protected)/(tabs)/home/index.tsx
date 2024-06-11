@@ -192,9 +192,6 @@ export default function Home() {
                     <Text style={style.subtitle}>Next Schedule</Text>
                     <NextSchedule role="USER" />
                 </View>
-                <Button mode="contained" onPress={() => router.push("/chat/1")}>
-                    Chat
-                </Button>
             </ScrollView>
         );
     } else {
@@ -361,9 +358,6 @@ export default function Home() {
                         <Text style={style.subtitle}>Next Schedule</Text>
                         <NextSchedule role="PROFESSIONAL" />
                     </View>
-                    <Button mode="contained" onPress={() => router.push("/chat/1")}>
-                        Chat
-                    </Button>
                 </ScrollView>
             );
         }

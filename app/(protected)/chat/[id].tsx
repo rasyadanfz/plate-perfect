@@ -75,13 +75,12 @@ export default function ChatRoom() {
         const update = setInterval(() => {
             setMinutes(
                 Math.floor(
-                    (new Date().getTime() - new Date(consultationData!.start_time).getTime()) / 1000 / 60
+                    (new Date(consultationData!.end_time).getTime() - new Date().getTime()) / 1000 / 60
                 )
             );
             setSeconds(
                 Math.floor(
-                    ((new Date().getTime() - new Date(consultationData!.start_time).getTime()) / 1000) %
-                        60
+                    ((new Date(consultationData!.end_time).getTime() - new Date().getTime()) / 1000) % 60
                 )
             );
         }, 1000);
@@ -114,12 +113,12 @@ export default function ChatRoom() {
         }
 
         function onEndByProfessional() {
-            Alert.alert("Consultation ended");
+            Alert.alert("Consultation Status", "Consultation has ended");
             router.push("/home");
         }
 
         function onEndByUser() {
-            Alert.alert("Consultation ended");
+            Alert.alert("Consultation Status", "Consultation has ended");
             router.push("/summary");
         }
 
@@ -184,10 +183,13 @@ export default function ChatRoom() {
             });
 
             if (role === "USER") {
-                socket.emit("endByUser");
+                socket.emit("endByUser", { id: (user as User).user_id, role: role });
                 router.push("/home");
             } else if (role === "PROFESSIONAL") {
-                socket.emit("endByProfessional");
+                socket.emit("endByProfessional", {
+                    id: (user as Professional).professional_id,
+                    role: role,
+                });
                 router.push("/summary");
             }
         } catch (error) {
@@ -231,7 +233,7 @@ export default function ChatRoom() {
                         time={msg.created_at}
                     />
                 ))}
-                {activity && <Text key="activity">{activity}</Text>}
+                <Text key="activity">{activity}</Text>
             </ScrollView>
 
             <View style={styles.chatInputContainer}>
