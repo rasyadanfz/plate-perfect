@@ -72,13 +72,56 @@ const consultationHist = () => {
         </View>
     );
     }else{
-        const [allConsultation, setAllConsultation] = useState<Consultation[]>([]);
-        
+        const [allBookingDone, setAllBookingDone] = useState<Booking[]>([]);
+
+        const {accessToken} = useAuth();
         useEffect(()=>{
-            const fetchdata = async () =>{
-                
+            const fetchBooking = async()=>{
+                try{
+                    const response  = await axios({
+                        method:"GET",
+                        url:`${BACKEND_URL}/api/booking/finishedBooking`,
+                        headers:{
+                            Authorization: `Bearer ${accessToken}`
+                        }
+                    })
+    
+                    if(response){
+                        setAllBookingDone(response.data.data);
+                    }else{
+                        console.log("Booking list empty")
+                    }
+                }catch(err){
+                    console.log("Fetch All Done Booking Eroor")
+                    console.log(err)
+                }
             }
-        })
+    
+            fetchBooking();
+        },[])
+
+
+
+        return (
+            <View style={style.allContainer}>
+                <FlatList 
+                    data={allBookingDone}
+                    keyExtractor={(item)=> item.booking_id}
+                    renderItem={
+                        ({item}) => (
+                            <View style={style.listItemContainer}>
+                                <HistoryCard
+                                        role="PROFESSIONAL"
+                                        type={item.type}
+                                        booking_id={item.booking_id}
+                                    />
+                            </View>
+                        )
+                    }
+                />
+            </View>
+        );
+
     }
 };
 
