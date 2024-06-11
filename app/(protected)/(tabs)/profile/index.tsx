@@ -16,7 +16,7 @@ export default function Profile() {
         if (logout) {
             router.replace("/signIn");
         }
-    };
+    };  
 
     const ListButtonDisabled = ({ text }: { text: string }) => {
         return (

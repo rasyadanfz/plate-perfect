@@ -18,6 +18,7 @@ import Icon from "react-native-vector-icons/FontAwesome5";
 export default function Home() {
     const { user, role, accessToken } = useAuth();
     const safeInsets = useSafeAreaInsets();
+
     const style = StyleSheet.create({
         container: {
             paddingTop: safeInsets.top - 10,
@@ -89,9 +90,7 @@ export default function Home() {
                     },
                     url: `${BACKEND_URL}/api/booking/oneUserHistory`,
                 });
-                if (!lodash.isEqual(response.data.data, userHistory)) {
-                    setUserHistory(response.data.data);
-                }
+                setUserHistory(response.data.data);
             } catch (error) {
                 console.log("oneHist");
                 console.log(error);
@@ -102,7 +101,7 @@ export default function Home() {
             setIsUpdate(true);
             await fetchProfessional();
             await fetchUserHistory();
-            console.log("FETCHING DATAA");
+
             setIsUpdate(false);
         };
 
@@ -161,14 +160,16 @@ export default function Home() {
                 <View style={style.sectionContainer}>
                     <View style={style.section}>
                         <Text style={style.subtitle}>Consultation History</Text>
-                        <Button
-                            mode="contained"
-                            style={{ backgroundColor: "#ecca9c" }}
-                            labelStyle={{ fontSize: 10, lineHeight: 10, color: "black" }}
-                            onPress={() => router.push("/home/consultationHist")}
-                        >
-                            See All
-                        </Button>
+                        {userHistory.length > 0 && (
+                            <Button
+                                mode="contained"
+                                style={{ backgroundColor: "#ecca9c" }}
+                                labelStyle={{ fontSize: 10, lineHeight: 10, color: "black" }}
+                                onPress={() => router.push("/home/consultationHist")}
+                            >
+                                See All
+                            </Button>
+                        )}
                     </View>
                     {userHistory.length > 0 && (
                         <Text style={style.sectionItem}>Your last consultation history</Text>
