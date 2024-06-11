@@ -51,6 +51,15 @@ export default function HistoryCard({
     user_id?: string;
     consultation?: Consultation;
 }) {
+    const handleSummary = (consultation_id: string) => {
+        router.push({
+            params: {
+                consultation_id,
+            },
+            pathname: "/summary",
+        });
+    };
+
     const handleChatHistoryPress = () => {
         router.push(`/chat/history/${consultation?.consultation_id}`);
     };
@@ -149,6 +158,7 @@ export default function HistoryCard({
                             mode="contained"
                             style={{ flex: 1, backgroundColor: "#ecca9c" }}
                             labelStyle={style.buttonText}
+                            onPress={() => handleSummary(consultationData.consultation_id)}
                         >
                             Summary &gt;
                         </Button>
