@@ -1,5 +1,5 @@
 import { View, Text, Alert, StyleSheet } from "react-native";
-import React from "react";
+import React, { useState } from "react";
 import { router, useLocalSearchParams } from "expo-router";
 import { BACKEND_URL } from "@env";
 import axios from "axios";
@@ -9,6 +9,7 @@ import { useAuth } from "../../../context/AuthProvider";
 const CreateSummary = () => {
     const { role, accessToken } = useAuth();
     const { consultation_id } = useLocalSearchParams();
+    const [content, setContent] = useState<string>("");
 
     const handleSummary = async () => {
         try {
@@ -17,6 +18,9 @@ const CreateSummary = () => {
                 url: `${BACKEND_URL}/api/summary/${consultation_id}`,
                 headers: {
                     Authorization: `Bearer ${accessToken}`,
+                },
+                data: {
+                    content: content,
                 },
             });
 
@@ -38,7 +42,11 @@ const CreateSummary = () => {
             <Text style={styles.question}>
                 Could you please summarize the recent online consultation?
             </Text>
-            <TextInput style={styles.input} placeholder="Type here..." />
+            <TextInput
+                style={styles.input}
+                placeholder="Type here..."
+                onChangeText={(e) => setContent(e)}
+            />
 
             <View style={styles.buttonContainer}>
                 <Button
