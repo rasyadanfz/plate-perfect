@@ -34,7 +34,7 @@ const style = StyleSheet.create({
         color: "black",
         fontSize: 10,
         lineHeight: 10,
-    },
+    }
 });
 
 export default function HistoryCard({
@@ -112,6 +112,12 @@ export default function HistoryCard({
         if(isLoading === false && consultationData && profData ){
 
             const date = new Date(consultationData.date);
+
+            const startDate = new Date(consultationData.start_time);
+const endDate = new Date(consultationData.end_time);
+
+const startHourMinute = `${startDate.getUTCHours().toString().padStart(2, '0')}:${startDate.getUTCMinutes().toString().padStart(2, '0')}`;
+const endHourMinute = `${endDate.getUTCHours().toString().padStart(2, '0')}:${endDate.getUTCMinutes().toString().padStart(2, '0')}`;
             
             return (
                 <View style={style.container}>
@@ -120,8 +126,9 @@ export default function HistoryCard({
                             <Text style={{ fontSize: 14 }}>Konsultasi {type}</Text>
                             <Text style={{ fontSize: 11 }}>{profData.name}</Text>
                         </View>
-                        <View>
-                            <Text style={{ fontSize: 13 }}>{date.toDateString()}</Text>
+                        <View >
+                            <Text style={{ fontSize: 13, textAlign:"right" }}>{date.toDateString()}</Text>
+                            <Text style={{fontSize:13, textAlign:"right"}}>{startHourMinute} - {endHourMinute} </Text>
                         </View>
                     </View>
                     <View style={style.buttonContainer}>
